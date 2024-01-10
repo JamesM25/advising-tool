@@ -1,0 +1,15 @@
+{
+  "name": "sdev485/advising-tool",
+  "authors": [
+    {
+      "name": "James Motherwell",
+      "email": "motherwell.james@student.greenriver.edu"
+    }
+  ],
+  "require": {
+    "bcosca/fatfree-core": "dev-master"
+  },
+  "autoload": {
+    "classmap": ["model/", "controller/"]
+  }
+}
