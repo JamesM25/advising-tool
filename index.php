@@ -15,5 +15,9 @@ $f3->route('GET /', function () {
     $GLOBALS['controller']->home();
 });
 
+$f3->route('GET|POST /form', function () {
+    $GLOBALS['controller']->studentForm();
+});
+
 // Run Fat-Free
 $f3->run();

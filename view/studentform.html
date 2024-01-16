@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <form action="#" method="post">
+        <fieldset>
+            <repeat group="{{ DataLayer::getRequiredCourse() }}" value="{{ @course }}">
+                <div>
+                    <input type="checkbox" value="{{ @course }}" name="courses[]" id="course-{{ @course }}"
+                        <check if="{{ in_array(@course, @form->courses) }}" >
+                        checked
+                        </check>
+                    >
+                    <label for="course-{{ @course }}">{{ @course }}</label>
+                </div>
+            </repeat>
+        </fieldset>
+
+        <div>
+            <label for="summer">Summer courses</label>
+            <input type="checkbox" name="summer" id="summer"
+                <check if="{{ @form->summer !== false }}">
+                checked
+                </check>
+            >
+        </div>
+
+        <div>
+            <label for="courses">Classes per quarter:</label>
+            <input type="number" name="num-courses" id="courses" value="{{ @form->coursesPerQuarter }}">
+        </div>
+
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
