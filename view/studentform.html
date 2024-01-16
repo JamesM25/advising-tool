@@ -30,7 +30,7 @@
 
         <div>
             <label for="courses">Classes per quarter:</label>
-            <input type="number" name="num-courses" id="courses" value="{{ @form->coursesPerQuarter }}">
+            <input type="number" name="num-courses" id="courses" value="{{ @form->coursesPerQuarter }}" min="1" max="5" required>
         </div>
 
         <button type="submit">Submit</button>

@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 // Turn on error reporting
 ini_set("display_errors", 1);
@@ -17,6 +18,10 @@ $f3->route('GET /', function () {
 
 $f3->route('GET|POST /form', function () {
     $GLOBALS['controller']->studentForm();
+});
+
+$f3->route('GET /schedule', function () {
+    $GLOBALS['controller']->schedule();
 });
 
 // Run Fat-Free

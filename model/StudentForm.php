@@ -20,6 +20,8 @@ class StudentForm {
             $this->courses = $data['courses'] ?? [];
             $this->coursesPerQuarter = $data['num-courses'] ?? "";
             $this->summer = $data['summer'] ?? false;
+
+            if ($this->coursesPerQuarter < 1) $this->_isValid = false;
         } else {
             // Defaults
             $this->courses = [];
@@ -30,5 +32,9 @@ class StudentForm {
         }
 
         //if (isset($))
+    }
+
+    public function isValid() {
+        return $this->_isValid;
     }
 }

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Schedule</title>
+</head>
+<body>
+
+<h1>Your Schedule</h1>
+
+<ul>
+    <repeat group="{{ @schedule }}" key="{{ @quarter }}" value="{{ @courses }}">
+        <li>
+            {{ @quarter }}
+            <ul>
+                <repeat group="{{ @courses }}" value="{{ @course }}">
+                    <li>{{ @course }}</li>
+                </repeat>
+            </ul>
+        </li>
+    </repeat>
+</ul>
+
+</body>
+</html>

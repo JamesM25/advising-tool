@@ -15,6 +15,12 @@ class Controller {
     function studentForm() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $form = new StudentForm($_POST);
+
+            if ($form->isValid()) {
+                // TODO: Figure out how to send classes over SESSION.
+                $_SESSION['preferences'] = $_POST;
+                $this->_f3->reroute('/schedule');
+            }
         } else {
             $form = new StudentForm([]);
         }
@@ -23,6 +29,15 @@ class Controller {
 
         $view = new Template();
         echo $view->render('view/studentform.html');
-        echo $_SERVER['REQUEST_METHOD'];
+    }
+
+    function schedule() {
+        $form = new StudentForm($_SESSION['preferences']);
+        $schedule = new Schedule($form);
+
+        $this->_f3->set("schedule", $schedule->schedule);
+
+        $view = new Template();
+        echo $view->render('view/schedule.html');
     }
 }
