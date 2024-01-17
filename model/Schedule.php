@@ -9,7 +9,7 @@ class Schedule {
         "summer"
     ];
 
-    static function getCurrentMonthIndex() {
+    private static function getCurrentMonthIndex() {
         $month = intval(date('n'));
 
         if ($month >= 1 && $month <= 3) {
@@ -18,7 +18,7 @@ class Schedule {
             return 0; // Fall
         } else if ($month >= 4 && $month <= 6) {
             return 2; // Spring
-        } else if ($month >= 7 && $month <= 9) {
+        } else /*if ($month >= 7 && $month <= 9)*/ {
             return 3; // Summer
         }
     }
@@ -27,49 +27,42 @@ class Schedule {
      * @param $form StudentForm
      */
     function __construct($form) {
-        $requiredCourses = DataLayer::getRequiredCourse();
-
-        //shuffle($requiredCourses);
-
-        $visited = $form->courses;
-
-        $queue = [];
-        $topsort = [];
-
-        do {
-            while (!empty($queue)) array_push($topsort, array_shift($queue));
-
-            for ($i = 0; $i < count($requiredCourses); $i++) {
-                $course = $requiredCourses[$i];
-                if (in_array($course, $visited)) continue;
-
-                $prerequisite = DataLayer::getPrerequisite($course);
-                if (empty($prerequisite) || in_array($prerequisite, $visited)) {
-                    array_push($queue, $course);
-                    array_push($visited, $course);
-                }
-            }
-        } while (!empty($queue));
-
+        $priorCourses = $form->courses;
+        $remainingCourses = array_diff(DataLayer::getRequiredCourse(), $priorCourses);
 
         $season = self::getCurrentMonthIndex();
         $year = intval(date('Y'));
-
         $this->schedule = [];
 
-        // TODO: There should be no quarters where one class requires another class being taken during the same quarter
-        while (!empty($topsort)) {
-            $quarterName = self::SEASONS[$season] . $year;
-            $quarterCourses = [];
-            for ($i = 0; $i < $form->coursesPerQuarter && !empty($topsort); $i++) {
-                // add quarter to schedule
-                array_push($quarterCourses, array_shift($topsort));
-            }
+        while (count($remainingCourses) > 0) {
+            // Find the courses that can be taken during the current quarter
+            $possibleCourses = [];
+            foreach ($remainingCourses as $course)
+                if (DataLayer::canTakeCourse($course, $priorCourses))
+                    array_push($possibleCourses, $course);
 
+            // Sort possible courses according to how many prerequisites they will fulfill
+            usort($possibleCourses, function($a, $b) {
+                return DataLayer::requirementCount($b) - DataLayer::requirementCount($a);
+            });
+
+            // Choose the courses that fulfill the most prerequisites
+            $quarterCourses = array_splice(
+                $possibleCourses,
+                0,
+                min(count($possibleCourses), $form->coursesPerQuarter));
+
+            // Add courses to the schedule
+            $quarterName = self::SEASONS[$season] . $year;
             $this->schedule[$quarterName] = $quarterCourses;
 
-            // Fall to Winter
-            if ($season == 0) $year++;
+            // Add courses to prior courses, remove them from remaining courses
+            $priorCourses = array_merge($priorCourses, $quarterCourses);
+            $remainingCourses = array_diff($remainingCourses, $quarterCourses);
+
+
+            // Increment the current quarter
+            if ($season == 0) $year++; // Fall -> Winter (December -> January)
 
             $season++;
             if ($season >= 4) $season = 0;
