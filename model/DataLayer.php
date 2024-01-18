@@ -24,6 +24,7 @@ class DataLayer {
             "eng101",
             "eng126/eng127/eng128/eng235",
             "cmst210/cmst220/cmst230/cmst238",
+            "Lab Science",
             "cs108/cs109",
             "sdev106",
             "sdev117",
