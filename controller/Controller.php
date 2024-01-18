@@ -9,6 +9,7 @@ class Controller {
     function home()
     {
         $view = new Template();
+        $this->_f3->set('title', 'GRC Advisor');
         echo $view->render('view/home.html');
     }
 
@@ -28,6 +29,7 @@ class Controller {
         $this->_f3->set("form", $form);
 
         $view = new Template();
+        $this->_f3->set('title', 'Student Advising Form');
         echo $view->render('view/studentform.html');
     }
 
