@@ -87,3 +87,7 @@ input
     color: gray;
     border-color: gray;
 }
+
+body#studentForm {
+    font-size: 16px !important;
+}
