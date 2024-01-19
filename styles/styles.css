@@ -50,6 +50,11 @@ html, body
 {
     background-color: white;
 }
+.row
+{
+    margin: auto;
+    width: 100%;
+}
 
 #studentForm /*body*/
 {
