@@ -82,10 +82,3 @@ input
     color: gray;
     border-color: gray;
 }
-
-.container
-{
-    border-color: darkgreen;
-    border-radius: 15px;
-    background-color: lightgoldenrodyellow;
-}
