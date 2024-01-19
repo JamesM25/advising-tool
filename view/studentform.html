@@ -1,34 +1,51 @@
 <include href="view/includes/header.html"></include>
-<body>
-    <form action="#" method="post">
+<body id="studentForm">
+<div class="container">
+    <h2>Student Advising Form</h2>
+
+    <form class="row g-3" action="#" method="post">
+        <div class="form-group">
         <fieldset>
+            <label>Check Previous Completed Classes</label>
+                <div class="row">
             <repeat group="{{ DataLayer::getRequiredCourse() }}" value="{{ @course }}">
-                <div>
-                    <input type="checkbox" value="{{ @course }}" name="courses[]" id="course-{{ @course }}"
-                        <check if="{{ in_array(@course, @form->courses) }}" >
+                <div class="col-3">
+                    <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="{{ @course }}" name="courses[]" id="course-{{ @course }}"
+                    <check if="{{ in_array(@course, @form->courses) }}" >
                         checked
-                        </check>
+                    </check>
                     >
-                    <label for="course-{{ @course }}">{{ @course }}</label>
+                    <label class="form-check-label" for="course-{{ @course }}">{{ @course }}</label>
+                </div>
                 </div>
             </repeat>
+                </div>
         </fieldset>
 
-        <div>
-            <label for="summer">Summer courses</label>
-            <input type="checkbox" name="summer" id="summer"
-                <check if="{{ @form->summer !== false }}">
+            <div class="row g-3">
+            <label>Would you like to include summer courses?</label>
+        <div class="col-auto form-check">
+            <label class="form-check-label" for="summer">Summer courses</label>
+            <input class="form-check-input" type="checkbox" name="summer" id="summer"
+            <check if="{{ @form->summer !== false }}">
                 checked
-                </check>
+            </check>
             >
         </div>
 
-        <div>
+        <div class="col-12">
             <label for="courses">Classes per quarter:</label>
-            <input type="number" name="num-courses" id="courses" value="{{ @form->coursesPerQuarter }}" min="1" max="5" required>
+            <input class="form-control" type="number" name="num-courses" id="courses" value="{{ @form->coursesPerQuarter }}" min="1" max="5" required>
         </div>
+            </div>
 
-        <button type="submit">Submit</button>
+            <div class="col-12">
+        <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
     </form>
+</div>
+
 </body>
 </html>

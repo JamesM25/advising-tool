@@ -44,3 +44,48 @@
     inset: 5px;
     border-radius: 15px;
 }
+
+/*Form Layout*/
+html, body
+{
+    background-color: white;
+}
+
+#studentForm /*body*/
+{
+    margin: auto;
+    width: 75%;
+    padding: 15px;
+}
+
+label
+{
+    font-weight: normal !important;
+}
+
+input
+{
+    max-width: 10%;
+}
+
+.btn-primary
+{
+    background-color: gray;
+    color: white;
+    border-color: gray;
+    margin: 10px auto;
+}
+
+.btn-primary:hover
+{
+    background-color: white;
+    color: gray;
+    border-color: gray;
+}
+
+.container
+{
+    border-color: darkgreen;
+    border-radius: 15px;
+    background-color: lightgoldenrodyellow;
+}
