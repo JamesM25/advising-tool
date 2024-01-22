@@ -3,23 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <title>Schedule</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap JS and its dependencies -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </head>
 <body>
-
-<h1>Your Schedule</h1>
-
-<ul>
-    <repeat group="{{ @schedule }}" key="{{ @quarter }}" value="{{ @courses }}">
-        <li>
-            {{ @quarter }}
-            <ul>
-                <repeat group="{{ @courses }}" value="{{ @course }}">
-                    <li>{{ @course }}</li>
-                </repeat>
+<nav class="navbar navbar-light bg-success">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">GRC Advisor</a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">Home</a></li>
+                <li><a href="form">FORM</a></li>
+                <li><a href="#">VIEW SCHEDULE</a></li>
+                <li><a href="#">Page 3</a></li>
             </ul>
-        </li>
-    </repeat>
-</ul>
-
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+                <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                <li><a href="#"><img src="images/logo.jpg" alt="Logo" class="navbar-logo"></a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<h1 class="text-center my-4">Your Schedule</h1>
+<div class="container">
+    <div class="row">
+        <repeat group="{{ @schedule }}" key="{{ @quarter }}" value="{{ @courses }}">
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        {{ @quarter }}
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <repeat group="{{ @courses }}" value="{{ @course }}">
+                            <li class="list-group-item">{{ @course }}</li>
+                        </repeat>
+                    </ul>
+                </div>
+            </div>
+        </repeat>
+    </div>
+</div>
 </body>
 </html>

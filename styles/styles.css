@@ -1,88 +1,86 @@
 .card {
-    width: 250px;
-    height: 350px;
-    background: rgba(101, 255, 34, 0.89);
-    position: relative;
-    display: flex;
-    place-content: center;
-    place-items: center;
-    overflow: hidden;
+    background: green;
     border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    height: 400px;
+    width: 100%;
 }
 
+.container{
+    margin-top: 120px;
+}
+
+
 .card h2 {
-    z-index: 1;
     color: white;
     font-size: 2em;
+    z-index: 1;
+    text-align: center;
+    margin-bottom: 10px;
+}
+.card li {
+    color: white;
+    background-color: black;
 }
 
 .card::before {
     content: '';
     position: absolute;
-    width: 250px;
     background-image: linear-gradient(180deg, rgba(74, 232, 12, 0.89), rgb(42, 101, 0));
     height: 130%;
+    width: 250px;
     animation: rotBGimg 3s linear infinite;
     transition: all 0.2s linear;
 }
 
 @keyframes rotBGimg {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .card::after {
     content: '';
     position: absolute;
     background: rgba(101, 255, 34, 0.89);
-;
     inset: 5px;
     border-radius: 15px;
 }
 
-/*Form Layout*/
-html, body
-{
+/* Rest of the original CSS */
+html, body {
     background-color: white;
 }
-.row
-{
+
+.row {
     margin: auto;
     width: 100%;
 }
 
-#studentForm /*body*/
-{
+#studentForm {
     margin: auto;
     width: 75%;
     padding: 15px;
 }
 
-label
-{
+label {
     font-weight: normal !important;
 }
 
-input
-{
+input {
     max-width: 10%;
 }
 
-.btn-primary
-{
+.btn-primary {
     background-color: gray;
     color: white;
     border-color: gray;
     margin: 10px auto;
 }
 
-.btn-primary:hover
-{
+.btn-primary:hover {
     background-color: white;
     color: gray;
     border-color: gray;
@@ -91,3 +89,53 @@ input
 body#studentForm {
     font-size: 16px !important;
 }
+
+/* Centering the cards */
+.row.justify-content-center {
+    justify-content: center;
+}
+
+/* For larger screens */
+@media (min-width: 992px) {
+    .col-md-4 {
+        max-width: 33.333333%;
+    }
+}
+
+/*
+    NAV BAR STYLES
+ */
+
+.navbar-brand {
+    font-weight: bold;
+    color: white;
+}
+
+.nav-link {
+    color: white;
+}
+
+.navbar-toggler {
+    border-color: white;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml, ...");
+}
+
+.navbar-light .navbar-nav .nav-link:hover,
+.navbar-light .navbar-nav .nav-link:focus {
+    color: #f8f9fa;
+}
+
+.navbar-light .navbar-nav .active>.nav-link,
+.navbar-light .navbar-nav .nav-link.active,
+.navbar-light .navbar-nav .nav-link.show,
+.navbar-light .navbar-nav .show>.nav-link {
+    color: #f8f9fa;
+}
+
+.navbar-logo {
+    height: 30px;
+}
+

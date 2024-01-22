@@ -1,45 +1,59 @@
 <include href="view/includes/header.html"></include>
 <body>
-<nav class="navbar navbar-light bg-success">
+<nav class="navbar navbar-expand-lg navbar-light bg-success">
     <div class="container-fluid">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">GRC Advisor</a>
-        </div>
-        <div class="collapse navbar-collapse" id="myNavbar">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="#">Home</a></li>
-                <li><a href="form">FORM</a></li>
-                <li><a href="#">VIEW SCHEDULE</a></li>
-                <li><a href="#">Page 3</a></li>
+        <a class="navbar-brand" href="#">GRC Advisor</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav mr-auto">
+                <!--<li class="nav-item active">
+                    <a class="nav-link" href="#">Home</a>
+                </li>-->
+                <li class="nav-item">
+                    <a class="nav-link" href="form">Form</a>
+                </li>
+                <!--<li class="nav-item">
+                    <a class="nav-link" href="#">View Schedule</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Page 3</a>
+                </li>-->
             </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-                <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-                <li><a href="#"><img src="images/logo.jpg" alt="Logo" class="navbar-logo"></a></li>
+            <ul class="navbar-nav navbar-right">
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><img src="images/logo.jpg" alt="Logo" class="navbar-logo"></a>
+                </li>
             </ul>
         </div>
     </div>
 </nav>
 <div class="container">
-    <div class="row">
+    <div class="row justify-content-center">
         <div class="col-sm-4">
             <div class="card">
-                <h2>CARD</h2>
+                <h2>SDEV 106</h2><br><br>
+                <h2> Front-End Web Development</h2>
+
             </div>
         </div>
         <div class="col-sm-4">
             <div class="card">
-                <h2>CARD</h2>
+                <h2>SDEV 201</h2><br><br>
+                <h2>Database Fundamentals</h2>
             </div>
         </div>
         <div class="col-sm-4">
             <div class="card">
-                <h2>CARD</h2>
+                <h2>SDEV 485</h2><br><br>
+                <h2> Capstone 1</h2>
             </div>
         </div>
     </div>
