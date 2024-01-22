@@ -11,10 +11,10 @@ class Schedule {
     const SUMMER = 3;
 
     const SEASONS = [
-        "fall",
-        "winter",
-        "spring",
-        "summer"
+        "fall ",
+        "winter ",
+        "spring ",
+        "summer "
     ];
 
     private static function getCurrentMonthIndex() {

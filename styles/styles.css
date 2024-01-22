@@ -21,10 +21,7 @@
     text-align: center;
     margin-bottom: 10px;
 }
-.card li {
-    color: white;
-    background-color: black;
-}
+
 
 .card::before {
     content: '';
@@ -139,3 +136,39 @@ body#studentForm {
     height: 30px;
 }
 
+/*
+    SCHEDULE CSS
+ */
+/* Styles specific to schedule.html */
+.schedule-card {
+    background-color: white; /* White background for the card */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    margin-bottom: 20px; /* Margin at the bottom of the card */
+    text-align: center; /* Center-align the text */
+}
+
+.schedule-card-header {
+    font-weight: bold; /* Bold font for the header */
+    font-size: 1.2em; /* Larger font size for the header */
+    background-color: #004d40; /* Dark green background */
+    color: white; /* White text color */
+    padding: 15px; /* Padding for the header */
+    border-top-left-radius: 10px; /* Rounded top-left corner */
+    border-top-right-radius: 10px; /* Rounded top-right corner */
+}
+
+.schedule-list-group-item {
+    padding: 10px; /* Padding for list items */
+    border-bottom: 1px solid #00695c; /* Dark green border between items */
+}
+
+.schedule-list-group-item:last-child {
+    border-bottom: none; /* No border for the last list item */
+}
+
+.schedule-card ul {
+    list-style-type: none; /* Remove default list style */
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+}
