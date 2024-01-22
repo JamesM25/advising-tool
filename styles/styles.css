@@ -62,6 +62,13 @@ html, body {
     padding: 15px;
 }
 
+.form /*div container with form*/
+{
+    border-radius: 5px;
+    border-color: #28a745;
+    border-width: 5px;
+}
+
 label {
     font-weight: normal !important;
 }
