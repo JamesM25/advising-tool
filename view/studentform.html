@@ -1,51 +1,49 @@
 <include href="view/includes/header.html"></include>
 
-<!-- TODO: The version of Bootstrap used on the home page does not seem to support grids,
-           but including a newer version breaks the navbar -->
-
 <body id="studentForm">
 <div class="container form">
     <h2>Student Advising Form</h2>
 
     <form class="row g-3" action="#" method="post">
-        <div class="form-group">
-        <fieldset>
-            <label class="bold-label">Check Previous Completed Classes</label>
-                <div class="row">
-            <repeat group="{{ DataLayer::getRequiredCourse() }}" value="{{ @course }}">
-                <div class="col-6">
-                    <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="{{ @course }}" name="courses[]" id="course-{{ @course }}"
-                    <check if="{{ in_array(@course, @form->courses) }}" >
-                        checked
-                    </check>
-                    >
-                    <label class="form-check-label" for="course-{{ @course }}">{{ @course }}</label>
-                </div>
-                </div>
-            </repeat>
-                </div>
-        </fieldset>
-            <br>
+        <div class="form-group px-2">
+            <fieldset>
+                <label class="bold-label">Check Previous Completed Classes</label>
+                    <div class="row">
+                        <repeat group="{{ DataLayer::getRequiredCourse() }}" value="{{ @course }}">
+                            <div class="col-6">
+                                <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="{{ @course }}" name="courses[]" id="course-{{ @course }}"
+                                <check if="{{ in_array(@course, @form->courses) }}" >
+                                    checked
+                                </check>
+                                >
+                                <label class="form-check-label" for="course-{{ @course }}">{{ @course }}</label>
+                            </div>
+                            </div>
+                        </repeat>
+                    </div>
+            </fieldset>
+            <hr>
 
-            <div class="row g-3">
-        <div class="col-12 form-check">
-            <input class="form-check-input" type="checkbox" name="summer" id="summer"
-            <check if="{{ @form->summer !== false }}">
-                checked
-            </check>
-            >
-            <label class="form-check-label bold-label" for="summer">Include Summer Courses </label>
-        </div>
-
-        <div class="col-12">
-            <label class="bold-label" for="courses">Classes Per Quarter</label>
-            <input class="form-control" type="number" name="num-courses" id="courses" value="{{ @form->coursesPerQuarter }}" min="1" max="5" required>
-        </div>
+            <div class="col-12">
+                <div class="row g-3">
+                    <div class="col-12 form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="summer" id="summer"
+                        <check if="{{ @form->summer !== false }}">
+                            checked
+                        </check>
+                        >
+                        <label class="form-check-label bold-label" for="summer">Include Summer Courses </label>
+                    </div>
+                    <div class="col-12">
+                        <label class="bold-label" for="courses">Classes Per Quarter</label>
+                        <input class="form-control" type="number" name="num-courses" id="courses" value="{{ @form->coursesPerQuarter }}" min="1" max="5" required>
+                    </div>
+                </div>
             </div>
 
             <div class="col-12">
-        <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </div>
     </form>
