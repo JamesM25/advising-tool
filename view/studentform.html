@@ -10,7 +10,7 @@
     <form class="row g-3" action="#" method="post">
         <div class="form-group">
         <fieldset>
-            <label>Check Previous Completed Classes</label>
+            <label class="bold-label">Check Previous Completed Classes</label>
                 <div class="row">
             <repeat group="{{ DataLayer::getRequiredCourse() }}" value="{{ @course }}">
                 <div class="col-6">
@@ -30,17 +30,16 @@
 
             <div class="row g-3">
         <div class="col-12 form-check">
-            <label class="form-check-label" for="summer">Include Summer Courses </label>
             <input class="form-check-input" type="checkbox" name="summer" id="summer"
             <check if="{{ @form->summer !== false }}">
                 checked
             </check>
             >
-            <label class="form-check-label" for="summer">Include Summer Courses </label>
+            <label class="form-check-label bold-label" for="summer">Include Summer Courses </label>
         </div>
 
         <div class="col-12">
-            <label for="courses">Classes per quarter:</label>
+            <label class="bold-label" for="courses">Classes Per Quarter</label>
             <input class="form-control" type="number" name="num-courses" id="courses" value="{{ @form->coursesPerQuarter }}" min="1" max="5" required>
         </div>
             </div>

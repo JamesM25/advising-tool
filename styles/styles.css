@@ -51,10 +51,6 @@ html, body {
     background-color: white;
 }
 
-.row {
-    margin: auto;
-    width: 100%;
-}
 
 #studentForm {
     margin: auto;
@@ -67,31 +63,46 @@ html, body {
     border-radius: 5px;
     border-color: #28a745;
     border-width: 5px;
+    border-style: solid;
+    background-color: #c3dcc3;
+    margin: 10px;
+    margin-left: 15px;
+    padding: 10px 5px;
+}
+
+.row
+{
+    margin-left: 15px; !important;
 }
 
 label {
-    font-weight: normal !important;
+font-weight: normal !important;
+}
+
+.bold-label
+{
+    font-weight: bold; !important;
 }
 
 input {
-    max-width: 10%;
+max-width: 10%;
 }
 
 .btn-primary {
-    background-color: gray;
-    color: white;
-    border-color: gray;
-    margin: 10px auto;
+background-color: #28a745;
+color: white;
+border-color: #28a745;
+margin: 10px auto;
 }
 
 .btn-primary:hover {
-    background-color: white;
-    color: gray;
-    border-color: gray;
+background-color: white;
+color: #28a745;
+border-color: #28a745;
 }
 
 body#studentForm {
-    font-size: 16px !important;
+font-size: 16px !important;
 }
 
 /* Centering the cards */
