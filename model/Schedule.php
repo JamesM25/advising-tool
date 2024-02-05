@@ -31,6 +31,21 @@ class Schedule {
         }
     }
 
+    private static function getTechCourses($courses, $count) {
+        $techCourses = [];
+
+        foreach ($courses as $course) {
+            if ($count == 0) break;
+
+            if (DataLayer::isTechCourse($course)) {
+                $techCourses[] = $course;
+                $count--;
+            }
+        }
+
+        return $techCourses;
+    }
+
     /**
      * @param $form StudentForm
      */
@@ -51,18 +66,24 @@ class Schedule {
         // If coursesPerQuarter is below 1, the while loop will never finish.
         if ($form->coursesPerQuarter < 1) return;
 
+        /*
+         * 3 classes per quarter: 2 tech, 1 gen-ed
+         * 2 classes per quarter: 1-2 tech, 0-1 gen-ed
+         */
+        $minTechCourses = intval($form->coursesPerQuarter * 0.75);
+
         while (count($remainingCourses) > 0) {
 
             // Find the courses that can be taken during the current quarter
             $possibleCourses = [];
             foreach ($remainingCourses as $course)
                 if (DataLayer::canTakeCourse($course, $priorCourses))
-                    array_push($possibleCourses, $course);
+                    $possibleCourses[] = $course;
 
             // Sort possible courses according to how many prerequisites they will fulfill
             // This way, it will prioritize courses which make the student eligible for more future courses.
             usort($possibleCourses, function($a, $b) {
-                return DataLayer::requirementCount($b) - DataLayer::requirementCount($a);
+                return DataLayer::getCoursePriority($b) - DataLayer::getCoursePriority($a);
             });
 
             // Don't include summer classes unless the summer checkbox was clicked
@@ -70,11 +91,18 @@ class Schedule {
                 $quarterCourses = [];
             }
             else {
+                $techCourses = self::getTechCourses($possibleCourses, $minTechCourses);
+                $possibleCourses = array_diff($possibleCourses, $techCourses);
+
+                $numRemainingCourses = min(count($possibleCourses), max($form->coursesPerQuarter - count($techCourses), 0));
+
+
+
                 // Choose the courses that fulfill the most prerequisites
-                $quarterCourses = array_splice(
+                $quarterCourses = array_merge($techCourses, array_splice(
                     $possibleCourses,
                     0,
-                    min(count($possibleCourses), $form->coursesPerQuarter));
+                    $numRemainingCourses));
             }
 
             // Add courses to the schedule

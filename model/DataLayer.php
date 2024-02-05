@@ -51,14 +51,35 @@ class DataLayer {
 
     /**
      * @param $course string course ID
+     * @return bool True if the given course is a technical (CS or SDEV) course.
+     */
+    public static function isTechCourse($course) {
+        return str_starts_with($course, "sdev") || str_starts_with($course, "cs");
+    }
+
+    /**
+     * @param $course string course ID
      * @return int Number of courses that require the given course
      */
-    public static function requirementCount($course) {
+    private static function requirementCount($course) {
         $sum = 0;
 
         foreach (self::PREREQUISITES as $key => $value)
             if ($value === $course) $sum++;
 
         return $sum;
+    }
+
+    /**
+     * @param $course string course ID
+     * @return int priority value
+     */
+    public static function getCoursePriority($course) {
+        $priority = self::requirementCount($course);
+
+        // sdev280 should be taken towards end of the program.
+        if ($course === "sdev280") $priority -= 1000;
+
+        return $priority;
     }
 }
