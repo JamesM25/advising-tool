@@ -1,0 +1,32 @@
+<include href="view/includes/header.html"></include>
+<body>
+<include href="/view/includes/navbar.html"></include>
+<link rel="stylesheet" href="styles/admin.css">
+
+<table id="courses">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Group</th>
+            <th>Prerequisites</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<div id="modal-background"></div>
+<div id="prerequisite-modal">
+    <h2>Prerequisites</h2>
+    <div class="content">
+        <div id="prerequisite-modal-fields"></div>
+        <button id="prerequisite-modal-close">Close</button>
+    </div>
+</div>
+
+<script src="scripts/admin.js"></script>
+
+</body>
+</html>

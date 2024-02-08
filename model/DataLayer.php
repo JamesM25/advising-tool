@@ -27,6 +27,7 @@ class DataLayer {
             "Lab Science",
             "cs108/cs109",
             "sdev106",
+            "sdev121",
             "sdev117",
             "sdev218",
             "sdev219",
@@ -81,5 +82,55 @@ class DataLayer {
         if ($course === "sdev280") $priority -= 1000;
 
         return $priority;
+    }
+
+    public static function getAllCourses() {
+        return array(
+            [
+                "id" => 1,
+                "name" => "math97",
+                "group" => null
+            ],
+            [
+                "id" => 2,
+                "name" => "sdev201",
+                "group" => null
+            ],
+            [
+                "id" => 3,
+                "name" => "sdev280",
+                "group" => null
+            ],
+            [
+                "id" => 4,
+                "name" => "math141",
+                "group" => 1
+            ],
+            [
+                "id" => 5,
+                "name" => "math146",
+                "group" => 1
+            ],
+            [
+                "id" => 6,
+                "name" => "sdev218",
+                "group" => null
+            ],
+        );
+    }
+
+    public static function getPrerequisites($courseId) {
+        $courses = self::getAllCourses();
+
+        foreach ($courses as $course) {
+            if ($course['id'] == $courseId) {
+                $prereq = self::PREREQUISITES[$course['name']];
+                if (empty($prereq)) return [];
+
+                return [ $prereq ];
+            }
+        }
+
+        return [];
     }
 }

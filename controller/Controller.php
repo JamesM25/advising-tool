@@ -42,4 +42,13 @@ class Controller {
         $view = new Template();
         echo $view->render('view/schedule.html');
     }
+
+    function admin() {
+        $this->_f3->set('title', 'Admin Dashboard');
+
+        $this->_f3->set('courses', DataLayer::getAllCourses());
+
+        $view = new Template();
+        echo $view->render('view/admin.html');
+    }
 }
