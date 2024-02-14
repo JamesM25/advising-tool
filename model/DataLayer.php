@@ -1,4 +1,7 @@
 <?php
+
+require_once $_SERVER['DOCUMENT_ROOT'].'/../db_advising.php';
+
 class DataLayer {
     private const PREREQUISITES = [
         "cs108/cs109" => "math97",
@@ -12,6 +15,17 @@ class DataLayer {
         "sdev219" => "sdev218",
         "sdev220" => "sdev219",
     ];
+
+    private $_dbh;
+
+    function __construct() {
+        try {
+            $this->_dbh = new PDO( DB_DSN, DB_USERNAME, DB_PASSWORD );
+        }
+        catch(PDOException $e) {
+            echo $e->getMessage();
+        }
+    }
 
     /**
      * @return string[] Array of course IDs required to graduate
