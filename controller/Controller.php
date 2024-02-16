@@ -8,8 +8,39 @@ class Controller {
         $this->dataLayer = new DataLayer();
     }
 
-    function home()
-    {
+    public function run() {
+        // Create a default route
+        $this->_f3->route('GET /', function () {
+            $this->home();
+        });
+
+        $this->_f3->route('GET|POST /form', function () {
+            $this->studentForm();
+        });
+
+        $this->_f3->route('GET /schedule', function () {
+            $this->schedule();
+        });
+
+        $this->_f3->route('GET /admin', function () {
+            $this->admin();
+        });
+
+        $this->_f3->route('GET /api/courses', function($f3) {
+            header("content-type: application/json");
+            echo json_encode($this->dataLayer->getAllCourses());
+        });
+
+        $this->_f3->route('GET /api/prerequisites/@course', function($f3, $params) {
+            header("content-type: application/json");
+            echo json_encode($this->dataLayer->getPrerequisites($params['course']));
+        });
+
+        // Run Fat-Free
+        $this->_f3->run();
+    }
+
+    function home() {
         $view = new Template();
         $this->_f3->set('title', 'GRC Advisor');
         echo $view->render('view/home.html');
@@ -28,6 +59,7 @@ class Controller {
             $form = new StudentForm([]);
         }
 
+        $this->_f3->set("courses", $this->dataLayer->getAllCourses());
         $this->_f3->set("form", $form);
 
         $view = new Template();
@@ -37,7 +69,7 @@ class Controller {
 
     function schedule() {
         $form = new StudentForm($_SESSION['preferences']);
-        $schedule = new Schedule($form);
+        $schedule = new Schedule($form, $this->dataLayer);
 
         $this->_f3->set("schedule", $schedule->schedule);
 
@@ -47,8 +79,6 @@ class Controller {
 
     function admin() {
         $this->_f3->set('title', 'Admin Dashboard');
-
-        $this->_f3->set('courses', DataLayer::getAllCourses());
 
         $view = new Template();
         echo $view->render('view/admin.html');

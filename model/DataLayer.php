@@ -3,19 +3,6 @@
 require_once $_SERVER['DOCUMENT_ROOT'].'/../db_advising.php';
 
 class DataLayer {
-    private const PREREQUISITES = [
-        "cs108/cs109" => "math97",
-        "math141/math147" => "math97",
-        "math146/math256" => "math97",
-        "eng126/eng127/eng128/eng235" => "eng101",
-        "sdev106" => "math97",
-        "sdev121" => "cs108/cs109",
-        "sdev117" => "sdev106",
-        "sdev218" => "math97",
-        "sdev219" => "sdev218",
-        "sdev220" => "sdev219",
-    ];
-
     private $_dbh;
 
     function __construct() {
@@ -28,123 +15,68 @@ class DataLayer {
     }
 
     /**
-     * @return string[] Array of course IDs required to graduate
-     */
-    public static function getRequiredCourse(): array {
-        return array(
-            "math97",
-            "math141/math147",
-            "math146/math256",
-            "eng101",
-            "eng126/eng127/eng128/eng235",
-            "cmst210/cmst220/cmst230/cmst238",
-            "Lab Science",
-            "cs108/cs109",
-            "sdev106",
-            "sdev121",
-            "sdev117",
-            "sdev218",
-            "sdev219",
-            "sdev220",
-            "sdev201",
-            "sdev280"
-        );
-    }
-
-    /**
-     * @param $course string a course ID, e.g. "sdev117"
+     * @param $course int a course ID
      * @param $priorCourses string[] of course IDs, e.g. [ "math97", "eng101", "sdev106" ]
      * @return boolean
      */
-    public static function canTakeCourse($course, $priorCourses) {
-        $prerequisite = self::PREREQUISITES[$course] ?? "";
+    public function canTakeCourse($course, $priorCourses) {
+        $prerequisites = $this->getPrerequisites($course);
 
-        if (empty($prerequisite)) return true; // No prerequisites
+        if (count($prerequisites) == 0) return true; // No prerequisites
 
-        return in_array($prerequisite, $priorCourses);
-    }
+        foreach ($priorCourses as $prior) {
 
-    /**
-     * @param $course string course ID
-     * @return bool True if the given course is a technical (CS or SDEV) course.
-     */
-    public static function isTechCourse($course) {
-        return str_starts_with($course, "sdev") || str_starts_with($course, "cs");
-    }
+            foreach ($prerequisites as $key=>$prerequisite) {
 
-    /**
-     * @param $course string course ID
-     * @return int Number of courses that require the given course
-     */
-    private static function requirementCount($course) {
-        $sum = 0;
+                if ($prerequisite['PrerequisiteID'] == $prior) {
+                    $groupNum = $prerequisite['GroupNum'];
 
-        foreach (self::PREREQUISITES as $key => $value)
-            if ($value === $course) $sum++;
+                    unset($prerequisites[$key]);
 
-        return $sum;
-    }
+                    if ($groupNum !== null) {
+                        $prerequisites = array_filter(
+                            $prerequisites,
+                            function ($prereq) use ($groupNum) {
+                                return $prereq['GroupNum'] != $groupNum;
+                            }
+                        );
+                    }
 
-    /**
-     * @param $course string course ID
-     * @return int priority value
-     */
-    public static function getCoursePriority($course) {
-        $priority = self::requirementCount($course);
-
-        // sdev280 should be taken towards end of the program.
-        if ($course === "sdev280") $priority -= 1000;
-
-        return $priority;
-    }
-
-    public static function getAllCourses() {
-        return array(
-            [
-                "id" => 1,
-                "name" => "math97",
-                "group" => null
-            ],
-            [
-                "id" => 2,
-                "name" => "sdev201",
-                "group" => null
-            ],
-            [
-                "id" => 3,
-                "name" => "sdev280",
-                "group" => null
-            ],
-            [
-                "id" => 4,
-                "name" => "math141",
-                "group" => 1
-            ],
-            [
-                "id" => 5,
-                "name" => "math146",
-                "group" => 1
-            ],
-            [
-                "id" => 6,
-                "name" => "sdev218",
-                "group" => null
-            ],
-        );
-    }
-
-    public static function getPrerequisites($courseId) {
-        $courses = self::getAllCourses();
-
-        foreach ($courses as $course) {
-            if ($course['id'] == $courseId) {
-                $prereq = self::PREREQUISITES[$course['name']];
-                if (empty($prereq)) return [];
-
-                return [ $prereq ];
+                    break;
+                }
             }
+
         }
 
-        return [];
+        return count($prerequisites) == 0;
+    }
+
+    /**
+     * @param $course int course ID
+     * @return int priority value
+     */
+    public function getCoursePriority($course) {
+        $sql = "SELECT COUNT(ClassID) FROM Prerequisites WHERE PrerequisiteID = :id";
+        $sql = $this->_dbh->prepare($sql);
+        $sql->bindParam(":id", $course, PDO::PARAM_INT);
+        $sql->execute();
+
+        return $sql->fetch()[0];
+    }
+
+
+    public function getAllCourses() {
+        $sql = "SELECT * FROM Classes";
+        $sql = $this->_dbh->prepare($sql);
+        $sql->execute();
+        return $sql->fetchAll();
+    }
+
+    public function getPrerequisites($courseId) {
+        $sql = "SELECT * FROM Prerequisites WHERE ClassID = :id";
+        $sql = $this->_dbh->prepare($sql);
+        $sql->bindParam(":id", $courseId, PDO::PARAM_INT);
+        $sql->execute();
+        return $sql->fetchAll();
     }
 }

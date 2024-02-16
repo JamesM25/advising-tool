@@ -10,6 +10,39 @@ function editPrequisites(course) {
 async function initializeAdminPage() {
     const coursesTableBody = document.querySelector("table#courses tbody");
 
+    /*
+     * API ROUTES:
+     *
+     * GET /api/courses
+     *  Returns an array of all courses.
+     *  Example: GET /api/courses
+     *  [
+     *      {
+     *          GroupNum: null,
+     *          ID: 1,
+     *          Name: "MATH97"
+     *      },
+     *      {
+     *          GroupNum: null,
+     *          ID: 2,
+     *          Name: "ENG101"
+     *      },
+     *      ...
+     *  ]
+     *
+     * GET /api/prerequisites/[Course ID]
+     *  Returns an array of all prerequisites corresponding with the given course ID.
+     *  Example: GET /api/prerequisites/22
+     *  [
+     *      {
+     *          ClassID: 7,
+     *          GroupNum: null,
+     *          PrerequisiteID: 1
+     *      }
+     *  ]
+     *
+     */
+
     // TODO: Account for different hostnames
     const url = 'https://jmotherwell.greenriverdev.com/485/advising-tool/api/courses';
     const init = {
@@ -21,11 +54,11 @@ async function initializeAdminPage() {
     for (const course of data) {
         coursesTableBody.innerHTML += `
         <tr>
-            <td>${course['id']}</td>
-            <td><input type="text" required value="${course['name']}"></td>
-            <td><input type="number" value="${course['group']}"></td>
+            <td>${course['ID']}</td>
+            <td><input type="text" required value="${course['Name']}"></td>
+            <td><input type="number" value="${course['GroupNum']}"></td>
             <td>
-                <button onclick="editPrequisites('${course['name']}')">Edit</button>
+                <button onclick="editPrequisites('${course['Name']}')">Edit</button>
             </td>
             <td>
                 <button>Update</button>
@@ -35,11 +68,11 @@ async function initializeAdminPage() {
 
     const prerequisiteFieldsContainer = document.getElementById("prerequisite-modal-fields");
     for (const course of data) {
-        const elementId = `checkbox-${course['id']}`;
+        const elementId = `checkbox-${course['ID']}`;
         prerequisiteFieldsContainer.innerHTML += `
         <div>
             <input type="checkbox" id="${elementId}">
-            <label for="${elementId}">${course['name']}</label>
+            <label for="${elementId}">${course['Name']}</label>
         </div>`;
     }
 

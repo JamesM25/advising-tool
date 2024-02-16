@@ -12,15 +12,15 @@
                 <fieldset>
                     <label class="bold-label">Check Previous Completed Classes</label>
                         <div class="row">
-                            <repeat group="{{ DataLayer::getRequiredCourse() }}" value="{{ @course }}">
+                            <repeat group="{{ @courses }}" value="{{ @course }}">
                                 <div class="col-6">
                                     <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="{{ @course }}" name="courses[]" id="course-{{ @course }}"
-                                    <check if="{{ in_array(@course, @form->courses) }}" >
+                                    <input class="form-check-input" type="checkbox" value="{{ @course['ID'] }}" name="courses[]" id="course-{{ @course['ID'] }}"
+                                    <check if="{{ in_array(@course['ID'], @form->courses) }}" >
                                         checked
                                     </check>
                                     >
-                                    <label class="form-check-label" for="course-{{ @course }}">{{ @course }}</label>
+                                    <label class="form-check-label" for="course-{{ @course['ID'] }}">{{ @course['Name'] }}</label>
                                 </div>
                                 </div>
                             </repeat>

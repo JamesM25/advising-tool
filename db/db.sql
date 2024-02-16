@@ -10,6 +10,7 @@ CREATE TABLE Classes (
 );
 
 CREATE TABLE Prerequisites (
+    -- Must take class with ID PrerequisiteID BEFORE taking class with ID ClassID.
     PrerequisiteID INT NOT NULL,
     ClassID INT NOT NULL,
     GroupNum INT,
@@ -43,8 +44,6 @@ INSERT INTO Classes (Name, GroupNum) VALUES
     ('CMST238', 4),
 
     ('LAB SCIENCE', NULL),
-
-    ('SDEV101', NULL),
 
     ('SDEV201', NULL),
 
@@ -82,6 +81,9 @@ INSERT INTO Prerequisites (PrerequisiteID, ClassID, GroupNum) VALUES
     ((SELECT ID FROM Classes WHERE Name='MATH97'), (SELECT ID FROM Classes WHERE Name='SDEV218'), NULL),
     ((SELECT ID FROM Classes WHERE Name='SDEV218'), (SELECT ID FROM Classes WHERE Name='SDEV219'), NULL),
     ((SELECT ID FROM Classes WHERE Name='SDEV219'), (SELECT ID FROM Classes WHERE Name='SDEV220'), NULL),
+
+    ((SELECT ID FROM Classes WHERE Name='MATH97'), (SELECT ID FROM Classes WHERE Name='CS108'), NULL),
+    ((SELECT ID FROM Classes WHERE Name='MATH97'), (SELECT ID FROM Classes WHERE Name='CS109'), NULL),
 
     ((SELECT ID FROM Classes WHERE Name='CS108'), (SELECT ID FROM Classes WHERE Name='SDEV121'), 1),
     ((SELECT ID FROM Classes WHERE Name='CS109'), (SELECT ID FROM Classes WHERE Name='SDEV121'), 1);
