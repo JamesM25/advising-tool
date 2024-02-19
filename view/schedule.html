@@ -10,14 +10,14 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
 <body>
 <include href="/view/includes/navbar.html"></include>
 <h1 class="text-center my-4">Your Schedule</h1>
 <div class="container">
     <div class="row">
         <repeat group="{{ @schedule }}" key="{{ @quarter }}" value="{{ @courses }}">
-            <div class="col-md-4 mb-4">
+            <div class="col-md-3 mb-4"> <!-- Divide into four columns -->
                 <div class="schedule-card">
                     <div class="schedule-card-header">
                         {{ @quarter }}
@@ -30,6 +30,17 @@
                 </div>
             </div>
         </repeat>
+        <!-- Placeholder for the summer quarter -->
+        <div class="col-md-3 mb-4"> <!-- Divide into four columns -->
+            <div class="schedule-card">
+                <div class="schedule-card-header">
+                    Summer
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="schedule-list-group-item">No courses scheduled</li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
 </body>
