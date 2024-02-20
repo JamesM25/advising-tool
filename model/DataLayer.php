@@ -66,10 +66,10 @@ class DataLayer {
 
 
     public function getAllCourses() {
-        $sql = "SELECT * FROM Classes";
+        $sql = "SELECT C.ID, C.Name, C.GroupNum, COUNT(P.PrerequisiteID) NumPrerequisites FROM Classes C LEFT JOIN Prerequisites P ON P.ClassID=C.ID GROUP BY C.ID";
         $sql = $this->_dbh->prepare($sql);
         $sql->execute();
-        return $sql->fetchAll();
+        return $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getPrerequisites($courseId) {
@@ -77,6 +77,35 @@ class DataLayer {
         $sql = $this->_dbh->prepare($sql);
         $sql->bindParam(":id", $courseId, PDO::PARAM_INT);
         $sql->execute();
-        return $sql->fetchAll();
+        return $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getCourseData($courseId) {
+        $sql = "SELECT * FROM Classes WHERE ID = :id";
+        $sql = $this->_dbh->prepare($sql);
+        $sql->bindParam(":id", $courseId, PDO::PARAM_INT);
+        $sql->execute();
+
+        $course = $sql->fetch(PDO::FETCH_ASSOC);
+
+        $sql = "SELECT PrerequisiteID AS 'ID',GroupNum FROM Prerequisites WHERE ClassID = :id";
+        $sql = $this->_dbh->prepare($sql);
+        $sql->bindParam(":id", $courseId, PDO::PARAM_INT);
+        $sql->execute();
+
+        $course['Prerequisites'] = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+        return $course;
+    }
+
+    public function updateCourse($course) {
+        $sql = "UPDATE Classes SET Name=:name, GroupNum=:group WHERE ID=:id";
+        $sql = $this->_dbh->prepare($sql);
+        $sql->bindParam(":name", $course["Name"], PDO::PARAM_STR);
+        $sql->bindParam(":group", $course["GroupNum"], PDO::PARAM_INT);
+        $sql->bindParam(":id", $course["ID"], PDO::PARAM_INT);
+        return $sql->execute();
+
+        // TODO: Prerequisites
     }
 }

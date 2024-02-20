@@ -2,7 +2,11 @@ td input {
     max-width: 100px !important;
 }
 
-#prerequisite-modal {
+#courses td, #courses th {
+    padding: 8px;
+}
+
+#course-modal {
     display: none;
     width: 600px;
     height: 400px;
@@ -21,7 +25,7 @@ td input {
     overflow: scroll;
 }
 
-#prerequisite-modal.visible {
+#course-modal.visible {
     display: inline-block;
 }
 
@@ -39,7 +43,7 @@ td input {
     background-color: #00000008;
 }
 
-#prerequisite-modal h2 {
+#course-modal h2 {
     background-color: green;
     color: white;
     text-align: center;
@@ -47,6 +51,20 @@ td input {
     padding: 8px;
 }
 
-#prerequisite-modal .content {
+#course-modal .content {
     padding: 8px;
+}
+
+#course-modal input {
+    display: block;
+    width: 100%;
+    max-width: unset;
+}
+
+#course-prerequisites {
+    margin-bottom: 8px;
+}
+
+.prerequisite-row {
+    margin-bottom: 4px;
 }

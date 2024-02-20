@@ -8,8 +8,8 @@
         <tr>
             <th>ID</th>
             <th>Name</th>
-            <th>Group</th>
             <th>Prerequisites</th>
+            <th>Group</th>
             <th></th>
         </tr>
     </thead>
@@ -18,11 +18,22 @@
 </table>
 
 <div id="modal-background"></div>
-<div id="prerequisite-modal">
+<div id="course-modal">
     <h2>Prerequisites</h2>
     <div class="content">
-        <div id="prerequisite-modal-fields"></div>
-        <button id="prerequisite-modal-close">Close</button>
+        <label for="course-name">Name</label>
+        <input id="course-name">
+
+        <h3>Prerequisites</h3>
+        <div id="course-prerequisites"></div>
+        <button id="course-modal-add-prerequisite">Add Prerequisite</button>
+
+        <hr>
+
+        <div class="form-buttons">
+            <button id="course-modal-submit">Submit</button>
+            <button id="course-modal-close">Cancel</button>
+        </div>
     </div>
 </div>
 

@@ -1,10 +1,103 @@
-const prerequisiteModal = document.getElementById("prerequisite-modal");
-const modelBackground = document.getElementById("modal-background");
-const prerequisiteModalHeading = document.querySelector("#prerequisite-modal h2");
+// TODO: Account for different hostnames
+const API_URL = `https://jmotherwell.greenriverdev.com/485/advising-tool/api`;
 
-function editPrequisites(course) {
-    prerequisiteModalHeading.textContent = `Prerequisites for ${course}`;
-    prerequisiteModal.className = modelBackground.className = "visible";
+let courses = [];
+
+const modal = {
+    root:               document.getElementById("course-modal"),
+    background:         document.getElementById("modal-background"),
+    heading:            document.querySelector("#course-modal h2"),
+    name:               document.getElementById("course-name"),
+    prerequisitesRoot:  document.getElementById("course-prerequisites"),
+    addPrerequisiteBtn: document.getElementById("course-modal-add-prerequisite"),
+    closeBtn:           document.getElementById("course-modal-close"),
+    submitBtn:          document.getElementById("course-modal-submit"),
+
+    // ID of the course being edited
+    editingId:            null
+};
+
+function createPrerequisiteRow(courseId) {
+    const row = modal.prerequisitesRoot.appendChild(document.createElement("div"));
+    row.className = "prerequisite-row";
+
+    const select = row.appendChild(document.createElement("select"));
+    select.className = "prerequisite-course";
+
+    let options = "<option>(None)</option>";
+
+    courses.forEach(course => {
+        const id = course['ID'];
+        const name = course['Name'];
+        const selected = id === courseId;
+
+        options += selected
+            ? `<option value="${id}" selected="selected">${name}</option>`
+            : `<option value="${id}">${name}</option>`;
+    });
+
+    select.innerHTML = options;
+}
+
+async function editCourse(course) {
+    // Make the modal visible to the user
+    modal.root.className = modal.background.className = "visible";
+
+    // Clear prior modal fields
+    modal.heading.textContent = `Loading...`;
+    modal.name.value = "";
+    modal.prerequisitesRoot.innerHTML = "";
+
+    // Request full data from the server
+    const response = await fetch(`${API_URL}/courses/${course}`);
+    const data = await response.json();
+
+    // Initialize modal fields
+    modal.name.value = data['Name'];
+
+    data['Prerequisites'].forEach(prerequisite => createPrerequisiteRow(prerequisite['ID']));
+
+    modal.heading.textContent = `${data['Name']}`;
+
+    modal.editingId = course;
+}
+
+async function submitCourse() {
+    const body = {
+        "ID": modal.editingId,
+        "Name": modal.name.value,
+        "Prerequisites": []
+    };
+
+    for (const row of modal.prerequisitesRoot.querySelectorAll(".prerequisite-row")) {
+        const course = row.querySelector(".prerequisite-course");
+
+        const courseId = course.value;
+        if (isNaN(courseId)) continue;
+
+        body["Prerequisites"].push({
+            "ID": courseId
+        });
+    }
+
+    const response = await fetch(`${API_URL}/courses/${modal.editingId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+    });
+
+    alert(response.ok
+        ? `Successfully updated "${body["Name"]}"`
+        : `Unable to update course data: ${response.status}`);
+
+    hideModal();
+}
+
+function hideModal() {
+    modal.root.className = modal.background.className = "";
+    modal.editingId = null;
 }
 
 async function initializeAdminPage() {
@@ -43,42 +136,35 @@ async function initializeAdminPage() {
      *
      */
 
-    // TODO: Account for different hostnames
-    const url = 'https://jmotherwell.greenriverdev.com/485/advising-tool/api/courses';
+
+    const url = `${API_URL}/courses`;
     const init = {
         method: "GET"
     };
     const response = await fetch(url, init);
     const data = await response.json();
 
-    for (const course of data) {
+    data.forEach(course => {
+        courses[course['ID']] = course;
+    })
+
+    courses.forEach(course => {
         coursesTableBody.innerHTML += `
         <tr>
             <td>${course['ID']}</td>
-            <td><input type="text" required value="${course['Name']}"></td>
-            <td><input type="number" value="${course['GroupNum']}"></td>
+            <td>${course['Name']}</td>
+            <td>${course['NumPrerequisites']}</td>
+            <td>${course['GroupNum'] ?? ""}</td>
             <td>
-                <button onclick="editPrequisites('${course['Name']}')">Edit</button>
-            </td>
-            <td>
-                <button>Update</button>
+                <button onclick="editCourse('${course['ID']}')">Edit</button>
             </td>
         </tr>`;
-    }
 
-    const prerequisiteFieldsContainer = document.getElementById("prerequisite-modal-fields");
-    for (const course of data) {
-        const elementId = `checkbox-${course['ID']}`;
-        prerequisiteFieldsContainer.innerHTML += `
-        <div>
-            <input type="checkbox" id="${elementId}">
-            <label for="${elementId}">${course['Name']}</label>
-        </div>`;
-    }
+    });
 
-    document.getElementById("prerequisite-modal-close").onclick = () => {
-        prerequisiteModal.className = modelBackground.className = "";
-    }
+    modal.addPrerequisiteBtn.onclick = createPrerequisiteRow;
+    modal.submitBtn.onclick = submitCourse;
+    modal.closeBtn.onclick = modal.background.onclick = hideModal;
 }
 
 initializeAdminPage();
