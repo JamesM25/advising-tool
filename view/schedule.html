@@ -23,24 +23,20 @@
                         {{ @quarter }}
                     </div>
                     <ul class="list-group list-group-flush">
-                        <repeat group="{{ @courses }}" value="{{ @course }}">
-                            <li class="schedule-list-group-item">{{ @course }}</li>
-                        </repeat>
+                        <check if="{{ empty(@courses) }}">
+                            <true>
+                                <li class="schedule-list-group-item">No courses scheduled</l
+                            </true>
+                            <false>
+                            <repeat group="{{ @courses }}" value="{{ @course }}">
+                                <li class="schedule-list-group-item">{{ @course }}</li>
+                            </repeat>
+                            </false>
+                        </check>
                     </ul>
                 </div>
             </div>
         </repeat>
-        <!-- Placeholder for the summer quarter -->
-        <div class="col-md-3 mb-4"> <!-- Divide into four columns -->
-            <div class="schedule-card">
-                <div class="schedule-card-header">
-                    Summer
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li class="schedule-list-group-item">No courses scheduled</li>
-                </ul>
-            </div>
-        </div>
     </div>
 </div>
 </body>
