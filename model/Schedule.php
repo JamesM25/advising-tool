@@ -5,10 +5,17 @@ class Schedule {
      */
     public $schedule;
 
-    private static function removeCourseGroup(&$courses, $group) {
-        if ($group == null) return;
+    private $dataLayer;
+    private $form;
 
-        $courses = array_filter($courses, function($course) use ($group) {
+    private $allCourses;
+    private $remainingCourses;
+    private $priorCourses;
+
+    private static function removeCourseGroup($courses, $group) {
+        if ($group == null) return $courses;
+
+        return array_filter($courses, function($course) use ($group) {
             return $course['GroupNum'] !== $group;
         });
     }
@@ -21,7 +28,7 @@ class Schedule {
             $groupNum = $prior['GroupNum'];
 
             unset($output[$key]);
-            self::removeCourseGroup($output, $groupNum);
+            $output = self::removeCourseGroup($output, $groupNum);
         }
 
         return $output;
@@ -43,24 +50,33 @@ class Schedule {
         return $string;
     }
 
-    private static function selectCourses($possibleCourses, $max) {
+    private function selectTopCourses($possibleCourses) {
+        // Sort possible courses according to how many prerequisites they will fulfill
+        // This way, it will prioritize courses which make the student eligible for more future courses.
+        usort($possibleCourses, function($a, $b) {
+            return $this->dataLayer->getCoursePriority($b['ID']) - $this->dataLayer->getCoursePriority($a['ID']);
+        });
+
         $output = [];
 
         /*
          * 3 classes per quarter: 2 tech, 1 gen-ed
          * 2 classes per quarter: 1-2 tech, 0-1 gen-ed
          */
-        $minTechCourses = intval($max * 0.75);
+        $minTechCourses = intval($this->form->coursesPerQuarter * 0.75);
 
         $techCourses = array_filter($possibleCourses, function($course) {
-            return str_starts_with($course['Name'], "SDEV") || str_starts_with($course['Name'], "CS");
+            return str_starts_with($course['Name'], "SDEV")
+                || str_starts_with($course['Name'], "CS");
         });
 
         while (count($techCourses) > 0 && count($output) < $minTechCourses) {
             $course = array_shift($techCourses);
             $output[] = $course;
-            self::removeCourseGroup($techCourses, $course['GroupNum']);
-            self::removeCourseGroup($possibleCourses, $course['GroupNum']);
+
+            // Remove the course (and grouped courses) from the array of possible courses
+            $techCourses = self::removeCourseGroup($techCourses, $course['GroupNum']);
+            $possibleCourses = self::removeCourseGroup($possibleCourses, $course['GroupNum']);
 
             foreach ($possibleCourses as $key=>$value) {
                 if ($value['ID'] == $course['ID']) {
@@ -70,13 +86,27 @@ class Schedule {
             }
         }
 
-        while (count($output) < $max && count($possibleCourses) > 0) {
+        while (count($output) < $this->form->coursesPerQuarter && count($possibleCourses) > 0) {
             $course = array_shift($possibleCourses);
             $output[] = $course;
-            self::removeCourseGroup($possibleCourses, $course['GroupNum']);
+            $possibleCourses = self::removeCourseGroup($possibleCourses, $course['GroupNum']);
         }
 
         return $output;
+    }
+
+    private function selectQuarterCourses() {
+        // Find the courses that can be taken during the current quarter
+        $priorCourseIDs = array_map(
+            function($course) { return $course['ID']; },
+            $this->priorCourses
+        );
+
+        $possibleCourses = array_filter($this->remainingCourses, function ($course) use ($priorCourseIDs) {
+            return $this->dataLayer->canTakeCourse($course['ID'], $priorCourseIDs);
+        });
+
+        return self::selectTopCourses($possibleCourses);
     }
 
     /**
@@ -84,18 +114,21 @@ class Schedule {
      * @param $dataLayer DataLayer
      */
     function __construct($form, $dataLayer) {
+        $this->dataLayer = $dataLayer;
+        $this->form = $form;
+
         // All courses that must be completed before graduation
-        $allCourses = [];
-        foreach ($dataLayer->getAllCourses() as $course)
-            $allCourses[$course['ID']] = $course;
+        $this->allCourses = [];
+        foreach ($this->dataLayer->getAllCourses() as $course)
+            $this->allCourses[$course['ID']] = $course;
 
         // Courses the student has already completed
-        $priorCourses = [];
-        foreach ($form->courses as $priorID)
-            $priorCourses[] = $allCourses[$priorID];
+        $this->priorCourses = [];
+        foreach ($this->form->courses as $priorID)
+            $this->priorCourses[] = $this->allCourses[$priorID];
 
         // Remaining courses that the student must complete before graduation
-        $remainingCourses = self::removePriorCourses($allCourses, $priorCourses);
+        $this->remainingCourses = self::removePriorCourses($this->allCourses, $this->priorCourses);
 
         // Get the current quarter
         $quarter = Quarter::current();
@@ -104,48 +137,28 @@ class Schedule {
         $this->schedule = [];
 
         // If coursesPerQuarter is below 1, the while loop will never finish.
-        if ($form->coursesPerQuarter < 1) return;
+        if ($this->form->coursesPerQuarter < 1) return;
 
-        while (count($remainingCourses) > 0) {
-            // Find the courses that can be taken during the current quarter
-            $possibleCourses = [];
-
-            $priorCourseIDs = array_map(
-                function($course) { return $course['ID']; },
-                $priorCourses
-            );
-
-            foreach ($remainingCourses as $course)
-                if ($dataLayer->canTakeCourse($course['ID'], $priorCourseIDs))
-                    $possibleCourses[] = $course;
-
-            // Sort possible courses according to how many prerequisites they will fulfill
-            // This way, it will prioritize courses which make the student eligible for more future courses.
-            usort($possibleCourses, function($a, $b) use ($dataLayer) {
-                return $dataLayer->getCoursePriority($b['ID']) - $dataLayer->getCoursePriority($a['ID']);
-            });
-
+        while (count($this->remainingCourses) > 0) {
             // Don't include summer classes unless the summer checkbox was clicked
-            if ($quarter->season == Quarter::SUMMER && !$form->summer) {
+            if ($quarter->season == Quarter::SUMMER && !$this->form->summer) {
                 $quarterCourses = [];
             } else {
-                $quarterCourses = self::selectCourses($possibleCourses, $form->coursesPerQuarter);
+                $quarterCourses = $this->selectQuarterCourses();
+
+                // Add courses to prior courses, remove them from remaining courses
+                $this->priorCourses = array_merge($this->priorCourses, $quarterCourses);
+                $this->remainingCourses = self::removePriorCourses($this->remainingCourses, $quarterCourses);
             }
 
             // Add courses to the schedule
             $quarterName = $quarter->toString();
-
             $this->schedule[$quarterName] = array_map(
-                function($course) use ($allCourses) {
-                    return self::getCourseGroupString($course, $allCourses);
+                function($course) {
+                    return self::getCourseGroupString($course, $this->allCourses);
                 },
                 $quarterCourses
             );
-
-            // Add courses to prior courses, remove them from remaining courses
-            $priorCourses = array_merge($priorCourses, $quarterCourses);
-            $remainingCourses = self::removePriorCourses($remainingCourses, $quarterCourses);
-
 
             // Increment the current quarter
             $quarter->increment();
