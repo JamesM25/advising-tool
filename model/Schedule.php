@@ -5,32 +5,6 @@ class Schedule {
      */
     public $schedule;
 
-    const FALL = 0;
-    const WINTER = 1;
-    const SPRING = 2;
-    const SUMMER = 3;
-
-    const SEASONS = [
-        "fall ",
-        "winter ",
-        "spring ",
-        "summer "
-    ];
-
-    private static function getCurrentMonthIndex() {
-        $month = intval(date('n'));
-
-        if ($month >= 1 && $month <= 3) {
-            return self::WINTER;
-        } else if ($month >= 10 && $month <= 12) {
-            return self::FALL;
-        } else if ($month >= 4 && $month <= 6) {
-            return self::SPRING;
-        } else /*if ($month >= 7 && $month <= 9)*/ {
-            return self::SUMMER;
-        }
-    }
-
     private static function removeCourseGroup(&$courses, $group) {
         if ($group == null) return;
 
@@ -107,6 +81,7 @@ class Schedule {
 
     /**
      * @param $form StudentForm
+     * @param $dataLayer DataLayer
      */
     function __construct($form, $dataLayer) {
         // All courses that must be completed before graduation
@@ -123,8 +98,7 @@ class Schedule {
         $remainingCourses = self::removePriorCourses($allCourses, $priorCourses);
 
         // Get the current quarter
-        $season = self::getCurrentMonthIndex();
-        $year = intval(date('Y'));
+        $quarter = Quarter::current();
 
         // Academic plan
         $this->schedule = [];
@@ -152,14 +126,14 @@ class Schedule {
             });
 
             // Don't include summer classes unless the summer checkbox was clicked
-            if ($season == self::SUMMER && !$form->summer) {
+            if ($quarter->season == Quarter::SUMMER && !$form->summer) {
                 $quarterCourses = [];
             } else {
                 $quarterCourses = self::selectCourses($possibleCourses, $form->coursesPerQuarter);
             }
 
             // Add courses to the schedule
-            $quarterName = self::SEASONS[$season] . $year;
+            $quarterName = $quarter->toString();
 
             $this->schedule[$quarterName] = array_map(
                 function($course) use ($allCourses) {
@@ -174,10 +148,7 @@ class Schedule {
 
 
             // Increment the current quarter
-            if ($season == self::FALL) $year++; // Fall -> Winter (December -> January)
-
-            $season++;
-            if ($season >= 4) $season = 0;
+            $quarter->increment();
         }
     }
 }
