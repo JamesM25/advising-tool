@@ -68,3 +68,53 @@ td input {
 .prerequisite-row {
     margin-bottom: 4px;
 }
+
+/*
+*The section below is responsible for the table view in the admin page
+ */
+
+#section-table-courses{
+    margin: 25px 25% 25px 25%;
+    display: flex;
+    justify-content: center;
+    border-color: #28a745;
+    border-width: medium;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+    border-radius: 25px;
+}
+
+table {
+    border-radius: 25px;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    text-align: left;
+}
+
+th {
+    text-align: left;
+    background-color: #f2f2f2;
+    padding: 10px 20px 10px 5px;
+}
+
+td {
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: rgba(75, 214, 75, 0.5);
+}
+
+button{
+    background-color: white;
+    border: 1px solid lightgray;
+    width: 100%;
+    border-radius: 10px;
+    transition-duration: 0.4s;
+}

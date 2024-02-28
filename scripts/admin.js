@@ -1,5 +1,4 @@
-// TODO: Account for different hostnames
-const API_URL = `https://jmotherwell.greenriverdev.com/485/advising-tool/api`;
+const API_URL = `${window.origin}/485/advising-tool/api`;
 
 let courses = [];
 
