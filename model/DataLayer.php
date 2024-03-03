@@ -52,10 +52,9 @@ class DataLayer {
 
     public function getAllCourses() {
         $sql = "SELECT
-            C.ID, C.Name, C.Priority, COUNT(P.PrerequisiteID) NumPrerequisites, COUNT(R.ClassID) RequiredFor
+            C.ID, C.Name, C.Priority, COUNT(P.PrerequisiteID) NumPrerequisites
             FROM Classes C
             LEFT JOIN Prerequisites P ON P.ClassID=C.ID
-            LEFT JOIN Prerequisites R ON R.PrerequisiteID=C.ID
             GROUP BY C.ID";
         $sql = $this->_dbh->prepare($sql);
         $sql->execute();
