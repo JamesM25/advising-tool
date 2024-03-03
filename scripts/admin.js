@@ -15,8 +15,13 @@ const modal = {
     submitBtn:          document.getElementById("course-modal-submit"),
 
     // ID of the course being edited
-    editingId:            null
+    editingId:          null,
+
+    // True if the user is creating a new course, false if the user is editing an existing course
+    creating:           false
 };
+
+const coursesTableBody = document.querySelector("table#courses tbody");
 
 const PLACEMENT_NAMES = {
     "-2": "Beginning",
@@ -53,7 +58,7 @@ function createPrerequisiteRow(courseId) {
     removeBtn.onclick = () => row.remove();
 }
 
-async function editCourse(course) {
+function openCourseModal() {
     // Make the modal visible to the user
     modal.root.className = modal.background.className = "visible";
 
@@ -62,6 +67,17 @@ async function editCourse(course) {
     modal.name.value = "";
     modal.prerequisitesRoot.innerHTML = "";
     modal.priority.value = 0;
+
+    modal.creating = false;
+}
+
+function beginAddCourse() {
+    openCourseModal();
+    modal.creating = true;
+}
+
+async function editCourse(course) {
+    openCourseModal();
 
     // Request full data from the server
     const response = await fetch(`${API_URL}/courses/${course}`);
@@ -76,6 +92,20 @@ async function editCourse(course) {
     modal.heading.textContent = `${data['Name']}`;
 
     modal.editingId = course;
+}
+
+async function deleteCourse(course) {
+    if (!confirm(`Delete ${course['Name']}?`)) return;
+
+    const id = course['ID'];
+
+    const response = await fetch(`${API_URL}/courses/${id}`, {
+        method: "DELETE"
+    });
+
+    courseRows[id].root.remove();
+    delete courseRows[id];
+    delete courses[id];
 }
 
 async function submitCourse() {
@@ -97,8 +127,12 @@ async function submitCourse() {
         });
     }
 
-    const response = await fetch(`${API_URL}/courses/${modal.editingId}`, {
-        method: "PUT",
+    const uri = modal.creating
+        ? `${API_URL}/courses`
+        : `${API_URL}/courses/${modal.editingId}`;
+
+    const response = await fetch(uri, {
+        method: modal.creating ? "POST" : "PUT",
         headers: {
             "Content-Type": "application/json"
         },
@@ -106,11 +140,13 @@ async function submitCourse() {
     });
 
     const result = await response.json();
-    updateCourseRow(result);
+
+    if (modal.creating) insertCourseRow(result);
+    else updateCourseRow(result);
 
     alert(response.ok
-        ? `Successfully updated "${body["Name"]}"`
-        : `Unable to update course data: ${response.status}`);
+        ? `Successfully submitted "${body["Name"]}"`
+        : `Unable to submit course data: ${response.status}`);
 
     hideModal();
 }
@@ -130,7 +166,6 @@ function updateCourseRow(course) {
     row.prerequisites.textContent = course['NumPrerequisites'];
 }
 
-
 function createCourseRow() {
     let row = {};
 
@@ -141,14 +176,26 @@ function createCourseRow() {
     row.prerequisites = row.root.appendChild(document.createElement("td"));
     row.edit = row.root.appendChild(document.createElement("td"));
     row.editBtn = row.edit.appendChild(document.createElement("button"));
+    row.delete = row.root.appendChild(document.createElement("td"));
+    row.deleteBtn = row.delete.appendChild(document.createElement("button"));
 
     row.editBtn.textContent = "Edit";
+    row.deleteBtn.textContent = "Delete";
 
     return row;
 }
+function insertCourseRow(course) {
+    const row = createCourseRow();
+
+    courseRows[course['ID']] = row;
+    coursesTableBody.appendChild(row.root);
+    row.editBtn.onclick = () => editCourse(course['ID']);
+    row.deleteBtn.onclick = () => deleteCourse(course);
+    updateCourseRow(course);
+}
 
 async function initializeAdminPage() {
-    const coursesTableBody = document.querySelector("table#courses tbody");
+
 
     /*
      * API ROUTES:
@@ -192,17 +239,13 @@ async function initializeAdminPage() {
         courses[course['ID']] = course;
     })
 
-    courses.forEach(course => {
-        const row = createCourseRow();
-        courseRows[course['ID']] = row;
-        coursesTableBody.appendChild(row.root);
-        row.editBtn.onclick = () => editCourse(course['ID']);
-        updateCourseRow(course);
-    });
+    courses.forEach(course => insertCourseRow(course));
 
     modal.addPrerequisiteBtn.onclick = createPrerequisiteRow;
     modal.submitBtn.onclick = submitCourse;
     modal.closeBtn.onclick = modal.background.onclick = hideModal;
+
+    document.getElementById("add-course-btn").onclick = beginAddCourse;
 }
 
 initializeAdminPage();

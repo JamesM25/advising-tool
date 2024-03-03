@@ -38,6 +38,19 @@ class Controller {
             echo json_encode($this->dataLayer->updateCourse($_PUT));
         });
 
+        $this->_f3->route('POST /api/courses', function ($f3) {
+            $course = json_decode(file_get_contents("php://input"), true);
+
+            //var_dump($_POST);
+
+            header("content-type: application/json");
+            echo json_encode($this->dataLayer->addCourse($course));
+        });
+
+        $this->_f3->route('DELETE /api/courses/@course', function ($f3, $params) {
+            $this->dataLayer->deleteCourseByID($params['course']);
+        });
+
         // Run Fat-Free
         $this->_f3->run();
     }

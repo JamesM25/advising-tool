@@ -88,18 +88,7 @@ class DataLayer {
         return $course;
     }
 
-    public function updateCourse($course) {
-        $sql = "UPDATE Classes SET Name=:name, Priority=:priority WHERE ID=:id";
-        $sql = $this->_dbh->prepare($sql);
-        $sql->bindParam(":name", $course["Name"], PDO::PARAM_STR);
-        $sql->bindParam(":priority", $course["Priority"], PDO::PARAM_INT);
-        $sql->bindParam(":id", $course["ID"], PDO::PARAM_INT);
-
-        // TODO: Prerequisites
-        $result = $sql->execute();
-
-
-
+    private function updateCoursePrerequisites($course) {
         $sql = "DELETE FROM Prerequisites WHERE ClassID = :id";
         $sql = $this->_dbh->prepare($sql);
         $sql->bindParam(":id", $course['ID'], PDO::PARAM_INT);
@@ -112,8 +101,49 @@ class DataLayer {
             $sql->bindParam(":class", $course['ID'], PDO::PARAM_INT);
             $sql->execute();
         }
+    }
+
+    public function updateCourse($course) {
+        $sql = "UPDATE Classes SET Name=:name, Priority=:priority WHERE ID=:id";
+        $sql = $this->_dbh->prepare($sql);
+        $sql->bindParam(":name", $course["Name"], PDO::PARAM_STR);
+        $sql->bindParam(":priority", $course["Priority"], PDO::PARAM_INT);
+        $sql->bindParam(":id", $course["ID"], PDO::PARAM_INT);
+
+        // TODO: Prerequisites
+        $result = $sql->execute();
+
+
+        $this->updateCoursePrerequisites($course);
+
 
 
         return $this->getCourseData($course["ID"]);
+    }
+
+    public function addCourse($course) {
+        $sql = "INSERT INTO Classes (Name, Priority) VALUES (:name, :priority)";
+        $sql = $this->_dbh->prepare($sql);
+        $sql->bindParam(":name", $course['Name'], PDO::PARAM_STR);
+        $sql->bindParam(":priority", $course['Priority'], PDO::PARAM_INT);
+        $sql->execute();
+
+        $course['ID'] = $this->_dbh->lastInsertId();
+
+        $this->updateCoursePrerequisites($course);
+
+        return $this->getCourseData($course['ID']);
+    }
+
+    public function deleteCourseByID($id) {
+        $sql = "DELETE FROM Classes WHERE ID=:id";
+        $sql = $this->_dbh->prepare($sql);
+        $sql->bindParam(":id", $id, PDO::PARAM_INT);
+        $sql->execute();
+
+        $sql = "DELETE FROM Prerequisites WHERE ClassID=:id OR PrerequisiteID=:id";
+        $sql = $this->_dbh->prepare($sql);
+        $sql->bindParam(":id", $id, PDO::PARAM_INT);
+        $sql->execute();
     }
 }
