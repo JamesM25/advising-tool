@@ -10,21 +10,10 @@ class Controller {
 
     public function run() {
         // Create a default route
-        $this->_f3->route('GET /', function () {
-            $this->home();
-        });
-
-        $this->_f3->route('GET|POST /form', function () {
-            $this->studentForm();
-        });
-
-        $this->_f3->route('GET /schedule', function () {
-            $this->schedule();
-        });
-
-        $this->_f3->route('GET /admin', function () {
-            $this->admin();
-        });
+        $this->_f3->route('GET /', $this->home(...));
+        $this->_f3->route('GET|POST /form', $this->studentForm(...));
+        $this->_f3->route('GET /schedule', $this->schedule(...));
+        $this->_f3->route('GET /admin', $this->admin(...));
 
         $this->_f3->route('GET /api/courses', function($f3) {
             header("content-type: application/json");

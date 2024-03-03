@@ -25,27 +25,12 @@ class DataLayer {
         if (count($prerequisites) == 0) return true; // No prerequisites
 
         foreach ($priorCourses as $prior) {
-
             foreach ($prerequisites as $key=>$prerequisite) {
-
                 if ($prerequisite['PrerequisiteID'] == $prior) {
-                    $groupNum = $prerequisite['GroupNum'];
-
                     unset($prerequisites[$key]);
-
-                    if ($groupNum !== null) {
-                        $prerequisites = array_filter(
-                            $prerequisites,
-                            function ($prereq) use ($groupNum) {
-                                return $prereq['GroupNum'] != $groupNum;
-                            }
-                        );
-                    }
-
                     break;
                 }
             }
-
         }
 
         return count($prerequisites) == 0;
@@ -66,7 +51,12 @@ class DataLayer {
 
 
     public function getAllCourses() {
-        $sql = "SELECT C.ID, C.Name, C.GroupNum, COUNT(P.PrerequisiteID) NumPrerequisites FROM Classes C LEFT JOIN Prerequisites P ON P.ClassID=C.ID GROUP BY C.ID";
+        $sql = "SELECT
+            C.ID, C.Name, C.Priority, COUNT(P.PrerequisiteID) NumPrerequisites, COUNT(R.ClassID) RequiredFor
+            FROM Classes C
+            LEFT JOIN Prerequisites P ON P.ClassID=C.ID
+            LEFT JOIN Prerequisites R ON R.PrerequisiteID=C.ID
+            GROUP BY C.ID";
         $sql = $this->_dbh->prepare($sql);
         $sql->execute();
         return $sql->fetchAll(PDO::FETCH_ASSOC);
@@ -88,7 +78,7 @@ class DataLayer {
 
         $course = $sql->fetch(PDO::FETCH_ASSOC);
 
-        $sql = "SELECT PrerequisiteID AS 'ID',GroupNum FROM Prerequisites WHERE ClassID = :id";
+        $sql = "SELECT PrerequisiteID AS 'ID' FROM Prerequisites WHERE ClassID = :id";
         $sql = $this->_dbh->prepare($sql);
         $sql->bindParam(":id", $courseId, PDO::PARAM_INT);
         $sql->execute();
@@ -99,10 +89,9 @@ class DataLayer {
     }
 
     public function updateCourse($course) {
-        $sql = "UPDATE Classes SET Name=:name, GroupNum=:group WHERE ID=:id";
+        $sql = "UPDATE Classes SET Name=:name WHERE ID=:id";
         $sql = $this->_dbh->prepare($sql);
         $sql->bindParam(":name", $course["Name"], PDO::PARAM_STR);
-        $sql->bindParam(":group", $course["GroupNum"], PDO::PARAM_INT);
         $sql->bindParam(":id", $course["ID"], PDO::PARAM_INT);
         return $sql->execute();
 

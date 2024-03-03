@@ -12,72 +12,51 @@ class Schedule {
     private $remainingCourses;
     private $priorCourses;
 
-    private static function removeCourseGroup($courses, $group) {
-        if ($group == null) return $courses;
-
-        return array_filter($courses, function($course) use ($group) {
-            return $course['GroupNum'] !== $group;
-        });
-    }
-
     private static function removePriorCourses($remaining, $priorCourses) {
         $output = $remaining;
 
         foreach ($priorCourses as $prior) {
             $key = $prior['ID'];
-            $groupNum = $prior['GroupNum'];
-
             unset($output[$key]);
-            $output = self::removeCourseGroup($output, $groupNum);
         }
 
         return $output;
     }
 
-    private static function getCourseGroupString($course, $allCourses) {
-        $group = $course['GroupNum'];
-        if ($group == null) return $course['Name'];
+    private function comparePossibleCourses($a, $b) {
+        $priorityCmp = $b['Priority'] - $a['Priority'];
+        if ($priorityCmp != 0) return $priorityCmp;
 
-        $string = $course['Name'];
-        foreach ($allCourses as $current) {
-            if ($current['ID'] == $course['ID'] || $current['GroupNum'] != $course['GroupNum']) {
-                continue;
-            }
+        // If priority is the same, prefer courses that fulfill the most prerequisites
+        return $b['RequiredFor'] - $a['RequiredFor'];
+    }
 
-            $string .= " / " . $current['Name'];
-        }
-
-        return $string;
+    private static function isTechCourse($course) {
+        return str_starts_with($course['Name'], "SDEV")
+            || str_starts_with($course['Name'], "CS");
     }
 
     private function selectTopCourses($possibleCourses) {
         // Sort possible courses according to how many prerequisites they will fulfill
         // This way, it will prioritize courses which make the student eligible for more future courses.
-        usort($possibleCourses, function($a, $b) {
-            return $this->dataLayer->getCoursePriority($b['ID']) - $this->dataLayer->getCoursePriority($a['ID']);
-        });
+        usort($possibleCourses, $this->comparePossibleCourses(...));
 
         $output = [];
 
         /*
+         * Select a minimum number of tech courses
          * 3 classes per quarter: 2 tech, 1 gen-ed
          * 2 classes per quarter: 1-2 tech, 0-1 gen-ed
          */
         $minTechCourses = intval($this->form->coursesPerQuarter * 0.75);
 
-        $techCourses = array_filter($possibleCourses, function($course) {
-            return str_starts_with($course['Name'], "SDEV")
-                || str_starts_with($course['Name'], "CS");
-        });
+        $techCourses = array_filter($possibleCourses, self::isTechCourse(...));
 
         while (count($techCourses) > 0 && count($output) < $minTechCourses) {
             $course = array_shift($techCourses);
             $output[] = $course;
 
             // Remove the course (and grouped courses) from the array of possible courses
-            $techCourses = self::removeCourseGroup($techCourses, $course['GroupNum']);
-            $possibleCourses = self::removeCourseGroup($possibleCourses, $course['GroupNum']);
-
             foreach ($possibleCourses as $key=>$value) {
                 if ($value['ID'] == $course['ID']) {
                     unset($possibleCourses[$key]);
@@ -89,7 +68,6 @@ class Schedule {
         while (count($output) < $this->form->coursesPerQuarter && count($possibleCourses) > 0) {
             $course = array_shift($possibleCourses);
             $output[] = $course;
-            $possibleCourses = self::removeCourseGroup($possibleCourses, $course['GroupNum']);
         }
 
         return $output;
@@ -98,13 +76,14 @@ class Schedule {
     private function selectQuarterCourses() {
         // Find the courses that can be taken during the current quarter
         $priorCourseIDs = array_map(
-            function($course) { return $course['ID']; },
+            fn($course) => $course['ID'],
             $this->priorCourses
         );
 
-        $possibleCourses = array_filter($this->remainingCourses, function ($course) use ($priorCourseIDs) {
-            return $this->dataLayer->canTakeCourse($course['ID'], $priorCourseIDs);
-        });
+        $possibleCourses = array_filter(
+            $this->remainingCourses,
+            fn($course) => $this->dataLayer->canTakeCourse($course['ID'], $priorCourseIDs)
+        );
 
         return self::selectTopCourses($possibleCourses);
     }
@@ -139,6 +118,8 @@ class Schedule {
         // If coursesPerQuarter is below 1, the while loop will never finish.
         if ($this->form->coursesPerQuarter < 1) return;
 
+        $remainingAttempts = 100;
+
         while (count($this->remainingCourses) > 0) {
             // Don't include summer classes unless the summer checkbox was clicked
             if ($quarter->season == Quarter::SUMMER && !$this->form->summer) {
@@ -154,14 +135,16 @@ class Schedule {
             // Add courses to the schedule
             $quarterName = $quarter->toString();
             $this->schedule[$quarterName] = array_map(
-                function($course) {
-                    return self::getCourseGroupString($course, $this->allCourses);
-                },
+                fn($course) => $course['Name'],
                 $quarterCourses
             );
 
-            // Increment the current quarter
             $quarter->increment();
+
+            if ($remainingAttempts-- <= 0) {
+                echo "An error occurred while processing the schedule";
+                break;
+            }
         }
     }
 }

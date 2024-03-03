@@ -110,12 +110,10 @@ async function initializeAdminPage() {
      *  Example: GET /api/courses
      *  [
      *      {
-     *          GroupNum: null,
      *          ID: 1,
      *          Name: "MATH97"
      *      },
      *      {
-     *          GroupNum: null,
      *          ID: 2,
      *          Name: "ENG101"
      *      },
@@ -128,7 +126,6 @@ async function initializeAdminPage() {
      *  [
      *      {
      *          ClassID: 7,
-     *          GroupNum: null,
      *          PrerequisiteID: 1
      *      }
      *  ]
@@ -152,8 +149,8 @@ async function initializeAdminPage() {
         <tr>
             <td>${course['ID']}</td>
             <td>${course['Name']}</td>
+            <td>${course['Priority']}</td>
             <td>${course['NumPrerequisites']}</td>
-            <td>${course['GroupNum'] ?? ""}</td>
             <td>
                 <button onclick="editCourse('${course['ID']}')">Edit</button>
             </td>
