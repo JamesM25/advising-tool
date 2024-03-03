@@ -24,11 +24,11 @@ const modal = {
 const coursesTableBody = document.querySelector("table#courses tbody");
 
 const PLACEMENT_NAMES = {
-    "-2": "Beginning",
-    "-1": "Early",
-    "0": "Middle",
-    "1": "Late",
-    "2": "End"
+    [-2]: "Beginning",
+    [-1]: "Early",
+    [0]:  "Middle",
+    [1]:  "Late",
+    [2]:  "End"
 };
 
 function createPrerequisiteRow(courseId) {
@@ -73,6 +73,7 @@ function openCourseModal() {
 
 function beginAddCourse() {
     openCourseModal();
+    modal.heading.textContent = "Add new course";
     modal.creating = true;
 }
 
@@ -89,7 +90,7 @@ async function editCourse(course) {
 
     data['Prerequisites'].forEach(prerequisite => createPrerequisiteRow(prerequisite['ID']));
 
-    modal.heading.textContent = `${data['Name']}`;
+    modal.heading.textContent = `Editing ${data['Name']}`;
 
     modal.editingId = course;
 }
@@ -195,39 +196,6 @@ function insertCourseRow(course) {
 }
 
 async function initializeAdminPage() {
-
-
-    /*
-     * API ROUTES:
-     *
-     * GET /api/courses
-     *  Returns an array of all courses.
-     *  Example: GET /api/courses
-     *  [
-     *      {
-     *          ID: 1,
-     *          Name: "MATH97"
-     *      },
-     *      {
-     *          ID: 2,
-     *          Name: "ENG101"
-     *      },
-     *      ...
-     *  ]
-     *
-     * GET /api/prerequisites/[Course ID]
-     *  Returns an array of all prerequisites corresponding with the given course ID.
-     *  Example: GET /api/prerequisites/22
-     *  [
-     *      {
-     *          ClassID: 7,
-     *          PrerequisiteID: 1
-     *      }
-     *  ]
-     *
-     */
-
-
     const url = `${API_URL}/courses`;
     const init = {
         method: "GET"
