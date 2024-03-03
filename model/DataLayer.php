@@ -84,17 +84,37 @@ class DataLayer {
         $sql->execute();
 
         $course['Prerequisites'] = $sql->fetchAll(PDO::FETCH_ASSOC);
+        $course['NumPrerequisites'] = count($course['Prerequisites']);
 
         return $course;
     }
 
     public function updateCourse($course) {
-        $sql = "UPDATE Classes SET Name=:name WHERE ID=:id";
+        $sql = "UPDATE Classes SET Name=:name, Priority=:priority WHERE ID=:id";
         $sql = $this->_dbh->prepare($sql);
         $sql->bindParam(":name", $course["Name"], PDO::PARAM_STR);
+        $sql->bindParam(":priority", $course["Priority"], PDO::PARAM_INT);
         $sql->bindParam(":id", $course["ID"], PDO::PARAM_INT);
-        return $sql->execute();
 
         // TODO: Prerequisites
+        $result = $sql->execute();
+
+
+
+        $sql = "DELETE FROM Prerequisites WHERE ClassID = :id";
+        $sql = $this->_dbh->prepare($sql);
+        $sql->bindParam(":id", $course['ID'], PDO::PARAM_INT);
+        $sql->execute();
+
+        foreach ($course['Prerequisites'] as $prerequisite) {
+            $sql = "INSERT INTO Prerequisites (PrerequisiteID, ClassID) VALUES (:prerequisite, :class)";
+            $sql = $this->_dbh->prepare($sql);
+            $sql->bindParam(":prerequisite", $prerequisite['ID'], PDO::PARAM_INT);
+            $sql->bindParam(":class", $course['ID'], PDO::PARAM_INT);
+            $sql->execute();
+        }
+
+
+        return $this->getCourseData($course["ID"]);
     }
 }

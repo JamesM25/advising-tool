@@ -33,7 +33,9 @@ class Controller {
         $this->_f3->route('PUT /api/courses/@course', function($f3, $params) {
             // Workaround to retrieve PUT request body, since PHP only provides GET and POST superglobals.
             $_PUT = json_decode(file_get_contents("php://input"), true);
-            $this->dataLayer->updateCourse($_PUT);
+
+            header("content-type: application/json");
+            echo json_encode($this->dataLayer->updateCourse($_PUT));
         });
 
         // Run Fat-Free

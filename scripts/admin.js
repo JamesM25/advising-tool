@@ -1,12 +1,14 @@
 const API_URL = `${window.origin}/485/advising-tool/api`;
 
 let courses = [];
+let courseRows = [];
 
 const modal = {
     root:               document.getElementById("course-modal"),
     background:         document.getElementById("modal-background"),
     heading:            document.querySelector("#course-modal h2"),
     name:               document.getElementById("course-name"),
+    priority:           document.getElementById("course-priority"),
     prerequisitesRoot:  document.getElementById("course-prerequisites"),
     addPrerequisiteBtn: document.getElementById("course-modal-add-prerequisite"),
     closeBtn:           document.getElementById("course-modal-close"),
@@ -14,6 +16,14 @@ const modal = {
 
     // ID of the course being edited
     editingId:            null
+};
+
+const PLACEMENT_NAMES = {
+    "-2": "Beginning",
+    "-1": "Early",
+    "0": "Middle",
+    "1": "Late",
+    "2": "End"
 };
 
 function createPrerequisiteRow(courseId) {
@@ -36,6 +46,11 @@ function createPrerequisiteRow(courseId) {
     });
 
     select.innerHTML = options;
+
+    const removeBtn = row.appendChild(document.createElement("button"));
+    removeBtn.textContent = "Remove";
+
+    removeBtn.onclick = () => row.remove();
 }
 
 async function editCourse(course) {
@@ -46,6 +61,7 @@ async function editCourse(course) {
     modal.heading.textContent = `Loading...`;
     modal.name.value = "";
     modal.prerequisitesRoot.innerHTML = "";
+    modal.priority.value = 0;
 
     // Request full data from the server
     const response = await fetch(`${API_URL}/courses/${course}`);
@@ -53,6 +69,7 @@ async function editCourse(course) {
 
     // Initialize modal fields
     modal.name.value = data['Name'];
+    modal.priority.value = data['Priority'];
 
     data['Prerequisites'].forEach(prerequisite => createPrerequisiteRow(prerequisite['ID']));
 
@@ -65,7 +82,8 @@ async function submitCourse() {
     const body = {
         "ID": modal.editingId,
         "Name": modal.name.value,
-        "Prerequisites": []
+        "Prerequisites": [],
+        "Priority":  modal.priority.value
     };
 
     for (const row of modal.prerequisitesRoot.querySelectorAll(".prerequisite-row")) {
@@ -87,6 +105,9 @@ async function submitCourse() {
         body: JSON.stringify(body)
     });
 
+    const result = await response.json();
+    updateCourseRow(result);
+
     alert(response.ok
         ? `Successfully updated "${body["Name"]}"`
         : `Unable to update course data: ${response.status}`);
@@ -97,6 +118,33 @@ async function submitCourse() {
 function hideModal() {
     modal.root.className = modal.background.className = "";
     modal.editingId = null;
+}
+
+function updateCourseRow(course) {
+    const row = courseRows[course['ID']];
+    if (row == null) throw new Error(`There is no course with ID ${course['ID']}`);
+
+    row.id.textContent = course['ID'];
+    row.name.textContent = course['Name'];
+    row.priority.textContent = PLACEMENT_NAMES[course['Priority']] ?? course['Priority'];
+    row.prerequisites.textContent = course['NumPrerequisites'];
+}
+
+
+function createCourseRow() {
+    let row = {};
+
+    row.root = document.createElement("tr");
+    row.id = row.root.appendChild(document.createElement("td"));
+    row.name = row.root.appendChild(document.createElement("td"));
+    row.priority = row.root.appendChild(document.createElement("td"));
+    row.prerequisites = row.root.appendChild(document.createElement("td"));
+    row.edit = row.root.appendChild(document.createElement("td"));
+    row.editBtn = row.edit.appendChild(document.createElement("button"));
+
+    row.editBtn.textContent = "Edit";
+
+    return row;
 }
 
 async function initializeAdminPage() {
@@ -145,17 +193,11 @@ async function initializeAdminPage() {
     })
 
     courses.forEach(course => {
-        coursesTableBody.innerHTML += `
-        <tr>
-            <td>${course['ID']}</td>
-            <td>${course['Name']}</td>
-            <td>${course['Priority']}</td>
-            <td>${course['NumPrerequisites']}</td>
-            <td>
-                <button onclick="editCourse('${course['ID']}')">Edit</button>
-            </td>
-        </tr>`;
-
+        const row = createCourseRow();
+        courseRows[course['ID']] = row;
+        coursesTableBody.appendChild(row.root);
+        row.editBtn.onclick = () => editCourse(course['ID']);
+        updateCourseRow(course);
     });
 
     modal.addPrerequisiteBtn.onclick = createPrerequisiteRow;

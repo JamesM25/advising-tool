@@ -9,7 +9,7 @@
             <tr>
                 <th>ID</th>
                 <th>Name</th>
-                <th>Priority</th>
+                <th>Placement</th>
                 <th>Prerequisites</th>
                 <th></th>
             </tr>
@@ -25,6 +25,15 @@
     <div class="content">
         <label for="course-name">Name</label>
         <input id="course-name">
+
+        <label for="course-priority">Placement</label>
+        <select id="course-priority">
+            <option value="-2">Beginning</option>
+            <option value="-1">Early</option>
+            <option value="0">Middle</option>
+            <option value="1">Late</option>
+            <option value="2">End</option>
+        </select>
 
         <h3>Prerequisites</h3>
         <div id="course-prerequisites"></div>

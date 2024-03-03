@@ -22,13 +22,13 @@ CREATE TABLE Prerequisites (
 
 -- Insert default data
 INSERT INTO Classes (Name, Priority) VALUES
-    ('MATH97', 2),
-    ('ENG101', 0),
-    ('ENG126/127/128/235', 0),
-    ('MATH141/147', 0),
-    ('MATH146/256', 0),
-    ('CMST210/220/230/238', 0),
-    ('LAB SCIENCE', 0),
+    ('MATH97', -2),
+    ('ENG101', -1),
+    ('ENG126/127/128/235', -1),
+    ('MATH141/147', -1),
+    ('MATH146/256', -1),
+    ('CMST210/220/230/238', -1),
+    ('LAB SCIENCE', -1),
     ('SDEV201', 0),
     ('SDEV106', 0),
     ('SDEV117', 0),
@@ -37,7 +37,7 @@ INSERT INTO Classes (Name, Priority) VALUES
     ('SDEV218', 0),
     ('SDEV219', 0),
     ('SDEV220', 0),
-    ('SDEV280', -2);
+    ('SDEV280', 2);
 
 INSERT INTO Prerequisites (PrerequisiteID, ClassID) VALUES
     ((SELECT ID FROM Classes WHERE Name='MATH97'), (SELECT ID FROM Classes WHERE Name='MATH141/147')),
