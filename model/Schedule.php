@@ -25,10 +25,10 @@ class Schedule {
 
     private function comparePossibleCourses($a, $b) {
         $priorityCmp = $a['Priority'] - $b['Priority'];
-        if ($priorityCmp != 0) return $priorityCmp;
+        return $priorityCmp;
 
         // If priority is the same, prefer courses that fulfill the most prerequisites
-        return $b['RequiredFor'] - $a['RequiredFor'];
+        // return $b['RequiredFor'] - $a['RequiredFor'];
     }
 
     private static function isTechCourse($course) {
