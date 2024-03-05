@@ -145,6 +145,9 @@ async function submitCourse() {
     if (modal.creating) insertCourseRow(result);
     else updateCourseRow(result);
 
+    // Insert/update clientside course data
+    courses[result['ID']] = result;
+
     alert(response.ok
         ? `Successfully submitted "${body["Name"]}"`
         : `Unable to submit course data: ${response.status}`);
