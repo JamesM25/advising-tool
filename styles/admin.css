@@ -186,6 +186,10 @@ button#course-modal-close{
     background-color: rgb(255, 69, 69);
     align-items: center;
     text-align: center;
+
+    .svgIcon path {
+        fill: rgb(255, 69, 69);
+    }
 }
 
 .remove_button:hover .svgIcon {
