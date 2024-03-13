@@ -77,13 +77,15 @@ class DataLayer {
 
         $course = $sql->fetch(PDO::FETCH_ASSOC);
 
-        $sql = "SELECT PrerequisiteID AS 'ID' FROM Prerequisites WHERE ClassID = :id";
-        $sql = $this->_dbh->prepare($sql);
-        $sql->bindParam(":id", $courseId, PDO::PARAM_INT);
-        $sql->execute();
+        if ($course != null) {
+            $sql = "SELECT PrerequisiteID AS 'ID' FROM Prerequisites WHERE ClassID = :id";
+            $sql = $this->_dbh->prepare($sql);
+            $sql->bindParam(":id", $courseId, PDO::PARAM_INT);
+            $sql->execute();
 
-        $course['Prerequisites'] = $sql->fetchAll(PDO::FETCH_ASSOC);
-        $course['NumPrerequisites'] = count($course['Prerequisites']);
+            $course['Prerequisites'] = $sql->fetchAll(PDO::FETCH_ASSOC);
+            $course['NumPrerequisites'] = count($course['Prerequisites']);
+        }
 
         return $course;
     }

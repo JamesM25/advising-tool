@@ -20,31 +20,34 @@ class Controller {
             echo json_encode($this->dataLayer->getAllCourses());
         });
 
-        $this->_f3->route('GET /api/prerequisites/@course', function($f3, $params) {
-            header("content-type: application/json");
-            echo json_encode($this->dataLayer->getPrerequisites($params['course']));
-        });
-
         $this->_f3->route('GET /api/courses/@course', function($f3, $params) {
+            $courseId = $params['course'];
+
+            $data = $this->dataLayer->getCourseData($courseId);
+            if ($data == null) $f3->error(404, "Course ID \"$courseId\" does not exist");
+
             header("content-type: application/json");
-            echo json_encode($this->dataLayer->getCourseData($params['course']));
+            echo json_encode($data);
         });
 
         $this->_f3->route('PUT /api/courses/@course', function($f3, $params) {
             // Workaround to retrieve PUT request body, since PHP only provides GET and POST superglobals.
             $_PUT = json_decode(file_get_contents("php://input"), true);
 
+            $data = $this->dataLayer->updateCourse($_PUT);
+
             header("content-type: application/json");
-            echo json_encode($this->dataLayer->updateCourse($_PUT));
+            echo json_encode($data);
         });
 
         $this->_f3->route('POST /api/courses', function ($f3) {
-            $course = json_decode(file_get_contents("php://input"), true);
+            $inputCourse = json_decode(file_get_contents("php://input"), true);
 
-            //var_dump($_POST);
+            $outputCourse = $this->dataLayer->addCourse($inputCourse);
 
+            http_response_code(201); // Created
             header("content-type: application/json");
-            echo json_encode($this->dataLayer->addCourse($course));
+            echo json_encode($outputCourse);
         });
 
         $this->_f3->route('DELETE /api/courses/@course', function ($f3, $params) {
