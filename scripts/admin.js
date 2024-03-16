@@ -135,9 +135,7 @@ async function submitCourse() {
         const courseId = course.value;
         if (isNaN(courseId)) continue;
 
-        body["Prerequisites"].push({
-            "ID": courseId
-        });
+        body["Prerequisites"].push(courseId);
     }
 
     const uri = modal.creating
@@ -179,7 +177,7 @@ function updateCourseRow(course) {
     row.id.textContent = course['ID'];
     row.name.textContent = course['Name'];
     row.priority.textContent = PLACEMENT_NAMES[course['Priority']] ?? course['Priority'];
-    row.prerequisites.textContent = course['NumPrerequisites'];
+    row.prerequisites.textContent = course['Prerequisites'].length;
 }
 
 function createCourseRow() {

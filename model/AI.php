@@ -54,7 +54,8 @@ class AI {
                 ]
             ],
             "response_format" => [ "type" => "json_object" ],
-            "frequency_penalty" => 0.5
+            "frequency_penalty" => 0.5,
+            "presence_penalty" => 0.25
         ];
 
         return $this->request($requestBody);
