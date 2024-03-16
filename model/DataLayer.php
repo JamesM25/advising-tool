@@ -15,8 +15,8 @@ class DataLayer {
     }
 
     /**
-     * @param $course int a course ID
-     * @param $priorCourses string[] of course IDs, e.g. [ "math97", "eng101", "sdev106" ]
+     * @param $course int Course ID
+     * @param $priorCourses int[] of course IDs
      * @return boolean
      */
     public function canTakeCourse($course, $priorCourses) {
@@ -26,7 +26,7 @@ class DataLayer {
 
         foreach ($priorCourses as $prior) {
             foreach ($prerequisites as $key=>$prerequisite) {
-                if ($prerequisite['PrerequisiteID'] == $prior) {
+                if ($prerequisite == $prior) {
                     unset($prerequisites[$key]);
                     break;
                 }
@@ -51,22 +51,24 @@ class DataLayer {
 
 
     public function getAllCourses() {
-        $sql = "SELECT
-            C.ID, C.Name, C.Priority, COUNT(P.PrerequisiteID) NumPrerequisites
-            FROM Classes C
-            LEFT JOIN Prerequisites P ON P.ClassID=C.ID
-            GROUP BY C.ID";
+        $sql = "SELECT ID, Name, Priority FROM Classes";
         $sql = $this->_dbh->prepare($sql);
         $sql->execute();
-        return $sql->fetchAll(PDO::FETCH_ASSOC);
+        $courses = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+        for ($i = 0; $i < count($courses); $i++) {
+            $courses[$i]['Prerequisites'] = $this->getPrerequisites($courses[$i]['ID']);
+        }
+
+        return $courses;
     }
 
     public function getPrerequisites($courseId) {
-        $sql = "SELECT * FROM Prerequisites WHERE ClassID = :id";
+        $sql = "SELECT PrerequisiteID FROM Prerequisites WHERE ClassID = :id";
         $sql = $this->_dbh->prepare($sql);
         $sql->bindParam(":id", $courseId, PDO::PARAM_INT);
         $sql->execute();
-        return $sql->fetchAll(PDO::FETCH_ASSOC);
+        return $sql->fetchAll(PDO::FETCH_COLUMN);
     }
 
     public function getCourseData($courseId) {
@@ -84,7 +86,6 @@ class DataLayer {
             $sql->execute();
 
             $course['Prerequisites'] = $sql->fetchAll(PDO::FETCH_ASSOC);
-            $course['NumPrerequisites'] = count($course['Prerequisites']);
         }
 
         return $course;
@@ -99,7 +100,7 @@ class DataLayer {
         foreach ($course['Prerequisites'] as $prerequisite) {
             $sql = "INSERT INTO Prerequisites (PrerequisiteID, ClassID) VALUES (:prerequisite, :class)";
             $sql = $this->_dbh->prepare($sql);
-            $sql->bindParam(":prerequisite", $prerequisite['ID'], PDO::PARAM_INT);
+            $sql->bindParam(":prerequisite", $prerequisite, PDO::PARAM_INT);
             $sql->bindParam(":class", $course['ID'], PDO::PARAM_INT);
             $sql->execute();
         }

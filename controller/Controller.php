@@ -88,8 +88,25 @@ class Controller {
     function schedule() {
         $form = new StudentForm($_SESSION['preferences']);
         $schedule = new Schedule($form, $this->dataLayer);
+        $schedule = $schedule->schedule;
 
-        $this->_f3->set("schedule", $schedule->schedule);
+        if (!empty($form->notes)) {
+            $ai = new AI();
+            $aiSchedule = $ai->adjustSchedule($this->dataLayer->getAllCourses(), $form, $schedule);
+
+            if ($aiSchedule === false) {
+                // TODO: Display an error message of some kind
+                echo "Error";
+            } else {
+                //$scheduleJson = json_encode($schedule);
+                //echo "<p>$scheduleJson</p>";
+                //echo "<p>$aiSchedule</p>";
+
+                $schedule = json_decode($aiSchedule);
+            }
+        }
+
+        $this->_f3->set("schedule", $schedule);
 
         $view = new Template();
         echo $view->render('view/schedule.html');

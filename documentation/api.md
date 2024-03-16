@@ -14,7 +14,7 @@ Courses are provided as objects using the following format:
 | ID               | int    | Unique, numeric identifier for the course.                                                                                                                             |
 | Name             | string | User-facing course name, e.g. "SDEV101."                                                                                                                               |
 | Priority         | int    | Course priority. Negative values indicate the course should be placed earlier into the schedule, positive values indicate it should be placed further towards the end. |
-| NumPrerequisites | int    | Number of prerequisite courses that must be taken before this course.                                                                                                  |
+| Prerequisites    | array  | Array of IDs for courses that must be completed before the student is eligible for this course.                                                                        |
 
 ## GET `/api/course/{ID}`
 Returns data for the course with the ID given at the end of the URL, including a list of prerequisites.
@@ -26,14 +26,7 @@ The course data is given in the following format:
 | ID               | int    | Unique, numeric identifier for the course.                                                                                                                             |
 | Name             | string | User-facing course name, e.g. "SDEV101."                                                                                                                               |
 | Priority         | int    | Course priority. Negative values indicate the course should be placed earlier into the schedule, positive values indicate it should be placed further towards the end. |
-| NumPrerequisites | int    | Number of prerequisite courses that must be taken before this course.                                                                                                  |
-| Prerequisites    | array  | Array of courses that must be completed before the student is eligible for this course.                                                                                |
-
-Elements in the `Prerequisites` array are given in the following format:
-
-| Field | Type | Notes                         |
-|-------|------|-------------------------------|
-| ID    | int  | ID of the prerequisite course |
+| Prerequisites    | array  | Array of IDs for courses that must be completed before the student is eligible for this course.                                                                        |
 
 Successful requests will return HTTP status 200. If the ID in the URL does not correspond with any course data, the status will be 404.
 
@@ -50,7 +43,7 @@ The input should be a JSON course object using the following format:
 | Prerequisites    | array  | Array of courses that must be completed before the student is eligible for this course.                                                                                |
 
 Note that this is largely equivalent to the format used by the `GET /api/courses/{ID}` route,
-except for the `ID` and `NumPrerequisites` fields, which are excluded as they are redundant when creating new data.
+except for the `ID` field, which is excluded as it is redundant when creating new data.
 
 If redundant fields are included in the input, they are ignored.
 

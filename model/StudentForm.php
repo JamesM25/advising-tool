@@ -6,7 +6,11 @@ class StudentForm {
 
     public $summer;
 
+    public $notes;
+
     private $_isValid;
+
+    public const MAX_NOTES_LENGTH = 2000;
 
 
 
@@ -20,13 +24,17 @@ class StudentForm {
             $this->courses = $data['courses'] ?? [];
             $this->coursesPerQuarter = $data['num-courses'] ?? "";
             $this->summer = $data['summer'] ?? false;
+            $this->notes = trim($data['notes']);
 
-            if ($this->coursesPerQuarter < 1) $this->_isValid = false;
+            if ($this->coursesPerQuarter < 1 || strlen($this->notes) > self::MAX_NOTES_LENGTH) {
+                $this->_isValid = false;
+            }
         } else {
             // Defaults
             $this->courses = [];
             $this->coursesPerQuarter = "";
             $this->summer = false;
+            $this->notes = "";
 
             $this->_isValid = false;
         }

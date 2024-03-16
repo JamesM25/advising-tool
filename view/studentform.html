@@ -42,6 +42,10 @@
                             <label class="bold-label" for="courses">Classes Per Quarter</label>
                             <input class="form-control" type="number" name="num-courses" id="courses" value="{{ @form->coursesPerQuarter }}" min="1" max="5" required>
                         </div>
+                        <div class="col-12">
+                            <label class="bold-label" for="notes">Additional notes (experimental, not used if left blank)</label><br>
+                            <textarea id="notes" name="notes" maxlength="{{ StudentForm::MAX_NOTES_LENGTH }}"></textarea>
+                        </div>
                     </div>
                 </div>
 
