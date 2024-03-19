@@ -42,3 +42,8 @@ Here, you can add or remove classes, as well as make edits to existing classes w
 Access this functionality by navigating to 'advising-tool/admin'.
 
 ![Editing class data via the admin page](documentation/img/admin_modal.png)
+
+## Documentation
+
+Additional documentation may be found in the `documentation` directory,
+including [API documentation](documentation/api.md) and [project structure](documentation/files.md).

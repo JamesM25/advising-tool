@@ -38,6 +38,16 @@ In our deployment, the project is located within a directory called `public_html
 e.g. `/home/james/public_html/`.
 In this case, the configuration file should be placed in `/home/james/`, e.g. `/home/james/advising_db.php`
 
+The contents of this file should be as follows:
+```php
+<?php
+define( "DB_DSN", "mysql:dbname=db_name_here" );
+define( "DB_USERNAME", "db_username_here" );
+define( "DB_PASSWORD", "db_password_here" );
+```
+With `db_name_here`, `db_username_here` and `db_password_here`
+replaced with their respective credentials in your database.
+
 The purpose of storing the file above the `public_html` directory is to ensure that it is never accessible from the web,
 as the file contains database access credentials.
 
