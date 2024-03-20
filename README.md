@@ -46,4 +46,4 @@ Access this functionality by navigating to 'advising-tool/admin'.
 ## Documentation
 
 Additional documentation may be found in the `documentation` directory,
-including [API documentation](documentation/api.md) and [project structure](documentation/files.md).
+including [project setup](documentation/setup.md), [API documentation](documentation/api.md) and [project structure](documentation/files.md).
