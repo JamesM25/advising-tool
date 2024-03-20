@@ -3,6 +3,12 @@
 This project was developed within a LAMP (Linux, Apache, MySQL, PHP) environment. While it may be possible to deploy
 the application within a different environment, this document will assume that a LAMP environment is used.
 
+## Composer
+This project uses the [Fat-Free Framework](https://fatfreeframework.com/) via the [Composer](https://getcomposer.org/) dependency manager.
+Composer must be installed on your deployment environment in order to initialize the project.
+
+After pulling this repository, you must run the following command from within the project directory: `composer install`.
+
 ## Database
 This project requires access to a MySQL database in order to store course and prerequisite data.
 A script is provided at `db/db.sql` to initialize the database tables and insert default data.
